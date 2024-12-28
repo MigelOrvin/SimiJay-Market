@@ -13,6 +13,7 @@ function App() {
     role: "",
   });
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
   const navigate = useNavigate(); // Initialize useNavigate
   const { setIsAuthenticated } = useContext(AuthContext); // Use AuthContext
 
@@ -71,17 +72,47 @@ function App() {
       setIsAuthenticated(true); // Menambahkan state untuk menandakan user sudah login
   
       // Redirect berdasarkan role pengguna
-      if (user.role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (user.role === "customer") {
-        navigate("/customer/dashboard", { replace: true });
-      } else if (user.role === "kasir") {
-        navigate("/kasir/dashboard", { replace: true });
+      if (user && user.role) {
+        switch (user.role) {
+          case "admin":
+            navigate("/admin/dashboard", { replace: true });
+            break;
+          case "customer":
+            navigate("/customer/dashboard", { replace: true });
+            break;
+          case "kasir":
+            navigate("/kasir/dashboard", { replace: true });
+            break;
+          default:
+            setSignIn(true); // Switch to sign-in form after successful registration
+            setSuccessMessage("Berhasil Terdaftar, Silahkan Login"); // Set success message
+        }
+      } else {
+        setSignIn(true); // Switch to sign-in form after successful registration
+        setSuccessMessage("Berhasil Terdaftar, Silahkan Login"); // Set success message
       }
-      alert("Registrasi berhasil!");
     } catch (error) {
-      console.error("Registrasi gagal", error.response ? error.response.data : error);
-      alert("Registrasi gagal: " + (error.response ? error.response.data.errors : error.message));
+      if (error.response) {
+        if (error.response.status === 409) {
+          setErrors({ api: "Email sudah digunakan." });
+        } else if (error.response.status === 422) {
+          const errors = error.response.data.errors;
+          if (errors.email) {
+            setErrors({ api: errors.email[0] });
+          } else if (errors.password) {
+            setErrors({ api: errors.password[0] });
+          } else if (errors.role) {
+            setErrors({ api: errors.role[0] });
+          } else {
+            setErrors({ api: "Registrasi gagal: " + JSON.stringify(errors) });
+          }
+        } else {
+          setErrors({ api: "Registrasi gagal: " + (error.response.data.message || error.message) });
+        }
+      } else {
+        setErrors({ api: "Registrasi gagal: " + error.message });
+      }
+      console.error("Registrasi gagal", error);
     }
   };
 
@@ -107,19 +138,50 @@ function App() {
       } else if (user.role === "kasir") {
         navigate("/kasir/dashboard", { replace: true });
       }
-      alert("Login berhasil!");
     } catch (error) {
-      // Menambahkan penanganan error lebih lanjut jika diperlukan
+      if (error.response && error.response.status === 404) {
+        setErrors({ api: "Email tidak ditemukan." });
+      } else if (error.response && error.response.status === 401) {
+        setErrors({ api: "Email ditemukan, tetapi password salah." });
+      } else if (error.response && error.response.status === 422) {
+        const errors = error.response.data.errors;
+        if (errors.email) {
+          setErrors({ api: errors.email[0] });
+        } else if (errors.password) {
+          setErrors({ api: errors.password[0] });
+        } else {
+          setErrors({ api: "Login gagal: " + JSON.stringify(errors) });
+        }
+      } else {
+        setErrors({ api: "Login gagal: " + (error.response ? error.response.data.message : error.message) });
+      }
       console.error("Login gagal", error);
-      alert("Login gagal: " + (error.response ? error.response.data.errors : error.message));
     }
   };  
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh', 
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        background: 'url(/src/assets/bg.gif) no-repeat center center fixed', 
+        backgroundSize: 'cover',
+        filter: 'blur(20px)',
+        zIndex: -1
+      }}></div>
       <Components.Container>
         {/* Register Form */}
-        <Components.SignUpContainer signinIn={signIn}>
+        <Components.SignUpContainer signinin={signIn}>
           <Components.Form onSubmit={handleRegister}>
             <Components.Title>Register</Components.Title>
             <Components.Input
@@ -168,12 +230,16 @@ function App() {
               <option value="kasir">Kasir</option>
             </Components.Input>
             <Components.Error>{errors.role}</Components.Error>
+
+            
+            <Components.Error>{errors.api}</Components.Error>
             <Components.Button type="submit">Register</Components.Button>
+           
           </Components.Form>
         </Components.SignUpContainer>
 
         {/* Login Form */}
-        <Components.SignInContainer signinIn={signIn}>
+        <Components.SignInContainer signinin={signIn}>
           <Components.Form onSubmit={handleLogin}>
             <Components.Title>Login</Components.Title>
             <Components.Input
@@ -198,13 +264,14 @@ function App() {
             <Components.Error>{errors.password}</Components.Error>
             <Components.Error>{errors.api}</Components.Error>
             <Components.Button type="submit">Login</Components.Button>
+            
           </Components.Form>
         </Components.SignInContainer>
 
         {/* Overlay */}
-        <Components.OverlayContainer signinIn={signIn}>
-          <Components.Overlay signinIn={signIn}>
-            <Components.LeftOverlayPanel signinIn={signIn}>
+        <Components.OverlayContainer signinin={signIn}>
+          <Components.Overlay signinin={signIn}>
+            <Components.LeftOverlayPanel signinin={signIn}>
               <Components.Title>Welcome Back!</Components.Title>
               <Components.Paragraph>
                 To keep connected with us please login with your personal info
@@ -214,7 +281,7 @@ function App() {
               </Components.GhostButton>
             </Components.LeftOverlayPanel>
 
-            <Components.RightOverlayPanel signinIn={signIn}>
+            <Components.RightOverlayPanel signinin={signIn}>
               <Components.Title>Hello, Friend!</Components.Title>
               <Components.Paragraph>
                 Enter your personal details and start your journey with us
@@ -230,4 +297,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;
