@@ -1,0 +1,177 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class UserController extends Controller
+{
+    public function index()
+    {
+        $user = User::all();
+
+        return response()->json($user);
+    }
+
+    public function create()
+    {
+        //
+    }
+
+    public function store(Request $request)
+    {
+        $sekarang = Carbon::now();
+        $tahun_bulan = $sekarang->year . $sekarang->month;
+        $cek = User::count();
+
+        if ($cek == 0) {
+            $urut = 10001;
+            $kode = 'SN' . $tahun_bulan . $urut;
+        } else {
+            $ambil = User::all()->last();
+            $urut = (int)substr($ambil->kode, -5) + 1;
+            $kode = 'SN' . $tahun_bulan . $urut;
+        }
+
+        try {
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string',
+                'role' => 'required|in:admin,supplier,kasir',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ]);
+
+            $user = User::create([
+                'kode' => $kode,
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
+
+            if ($request->hasFile('foto')) {
+                $fileName = time() . '.' . $request->foto->getClientOriginalExtension();
+                $request->foto->storeAs('public/fotos', $fileName);
+                $user->foto = $fileName;
+                $user->save();
+            }
+
+            return response()->json($user, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json($user);
+    }
+
+    public function edit(User $user)
+    {
+        //
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'required|in:admin,supplier,kasir',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        
+        $user->nama = $request->nama;
+        $user->email = $request->email;
+        $user->role = $request->role;
+
+        if ($request->has('password') && $request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($user->foto && Storage::exists('public/fotos/' . $user->foto)) {
+                Storage::delete('public/fotos/' . $user->foto);
+            }
+
+            $fileName = time() . '.' . $request->foto->getClientOriginalExtension();
+            $request->foto->storeAs('public/fotos', $fileName);
+            $user->foto = $fileName;
+        }
+
+        $user->save();
+
+        return response()->json($user);
+    }
+
+
+
+    public function updateProfile(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $currentUser = Auth::user();
+
+            if ($currentUser->role === 'customer' && $currentUser->id != $user->id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    $oldPhotoPath = public_path($user->foto);
+                    if (file_exists($oldPhotoPath)) {
+                        unlink($oldPhotoPath);
+                    }
+                }
+
+                $fotoPath = $request->file('foto')->store('photos', 'public');
+                $user->foto = 'storage/' . $fotoPath;
+            }
+
+            $user->nama = $request->nama;
+            $user->email = $request->email;
+
+
+            if ($request->password) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            return response()->json($user);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'Berhasil menghapus data']);
+    }
+}
