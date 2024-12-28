@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
@@ -56,9 +57,8 @@ class UserController extends Controller
             ]);
 
             if ($request->hasFile('foto')) {
-                $fileName = time() . '.' . $request->foto->getClientOriginalExtension();
-                $request->foto->storeAs('public/fotos', $fileName);
-                $user->foto = $fileName;
+                $relativePath = $this->saveImage($request->foto);
+                $user->foto = $relativePath;
                 $user->save();
             }
 
@@ -68,6 +68,22 @@ class UserController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    private function saveImage($image)
+    {
+        $dir = 'images/fotos/';
+        $fileName = time() . '.' . $image->getClientOriginalExtension();
+        $absolutePath = public_path($dir);
+        $relativePath = $dir . $fileName;
+
+        if (!File::exists($absolutePath)) {
+            File::makeDirectory($absolutePath, 0755, true);
+        }
+
+        $image->move($absolutePath, $fileName);
+
+        return $relativePath;
     }
 
     public function show($id)
@@ -106,21 +122,20 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('foto')) {
-            if ($user->foto && Storage::exists('public/fotos/' . $user->foto)) {
-                Storage::delete('public/fotos/' . $user->foto);
+            if ($user->foto) {
+                $absolutePath = public_path($user->foto);
+                File::delete($absolutePath);
             }
 
-            $fileName = time() . '.' . $request->foto->getClientOriginalExtension();
-            $request->foto->storeAs('public/fotos', $fileName);
-            $user->foto = $fileName;
+            $relativePath = $this->saveImage($request->foto);
+            $user->foto = $relativePath;
+            $user->save();
         }
 
         $user->save();
 
         return response()->json($user);
     }
-
-
 
     public function updateProfile(Request $request, $id)
     {
