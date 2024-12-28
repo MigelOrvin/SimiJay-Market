@@ -12,6 +12,7 @@ function App() {
     password: "",
     role: "",
   });
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate(); // Initialize useNavigate
   const { setIsAuthenticated } = useContext(AuthContext); // Use AuthContext
 
@@ -23,29 +24,39 @@ function App() {
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.nama || formData.nama.length < 3) {
-      alert("Nama harus memiliki setidaknya 3 karakter.");
-      return false;
-    }
+  const validateLoginForm = () => {
+    const newErrors = {};
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      alert("Email tidak valid.");
-      return false;
+      newErrors.email = "Email tidak valid.";
     }
     if (!formData.password || formData.password.length < 8) {
-      alert("Password harus memiliki setidaknya 8 karakter.");
-      return false;
+      newErrors.password = "Password harus memiliki setidaknya 8 karakter.";
     }
-    if (!signIn && !formData.role) {
-      alert("Role harus dipilih.");
-      return false;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateRegisterForm = () => {
+    const newErrors = {};
+    if (!formData.nama || formData.nama.length < 3) {
+      newErrors.nama = "Nama harus memiliki setidaknya 3 karakter.";
     }
-    return true;
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email tidak valid.";
+    }
+    if (!formData.password || formData.password.length < 8) {
+      newErrors.password = "Password harus memiliki setidaknya 8 karakter.";
+    }
+    if (!formData.role) {
+      newErrors.role = "Role harus dipilih.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateRegisterForm()) return;
     
     try {
       const response = await Api.post("/api/register", {
@@ -76,7 +87,7 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateLoginForm()) return;
 
     try {
       const response = await Api.post("/api/login", {
@@ -120,6 +131,7 @@ function App() {
               required
               style={{ borderRadius: '30px', marginTop: '20px' }}
             />
+            <Components.Error>{errors.nama}</Components.Error>
             <Components.Input
               type="email"
               name="email"
@@ -129,6 +141,7 @@ function App() {
               required
               style={{ borderRadius: '30px' }}
             />
+            <Components.Error>{errors.email}</Components.Error>
             <Components.Input
               type="password"
               name="password"
@@ -138,6 +151,7 @@ function App() {
               required
               style={{ borderRadius: '30px' }}
             />
+            <Components.Error>{errors.password}</Components.Error>
             <Components.Input
               as="select"
               name="role"
@@ -153,6 +167,7 @@ function App() {
               <option value="customer">Customer</option>
               <option value="kasir">Kasir</option>
             </Components.Input>
+            <Components.Error>{errors.role}</Components.Error>
             <Components.Button type="submit">Register</Components.Button>
           </Components.Form>
         </Components.SignUpContainer>
@@ -170,6 +185,7 @@ function App() {
               required
               style={{ borderRadius: '30px', marginTop: '20px' }}
             />
+            <Components.Error>{errors.email}</Components.Error>
             <Components.Input
               type="password"
               name="password"
@@ -179,6 +195,8 @@ function App() {
               required
               style={{ borderRadius: '30px', marginBottom: '20px' }}
             />
+            <Components.Error>{errors.password}</Components.Error>
+            <Components.Error>{errors.api}</Components.Error>
             <Components.Button type="submit">Login</Components.Button>
           </Components.Form>
         </Components.SignInContainer>

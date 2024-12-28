@@ -65,6 +65,12 @@ width: 100%;
 border-radius: 5px; /* Add border-radius */
 `;
 
+export const Error = styled.div`
+color: red;
+font-size: 12px;
+margin-top: -10px;
+margin-bottom: 10px;
+`;
 
 export const Button = styled.button`
    border-radius: 20px;
