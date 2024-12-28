@@ -177,7 +177,7 @@ export default function BarangIndex() {
                                 src={
                                   barangs.gambar
                                     ? `http://localhost:8000/${barangs.gambar}`
-                                    : "https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg"
+                                    : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
                                 }
                                 style={{ width: "100px", height: "auto" }}
                               />

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [expandedCard, setExpandedCard] = useState(null);
   const navigate = useNavigate();
 
   const fetchDataBarang = async () => {
@@ -41,9 +42,24 @@ export default function BarangIndex() {
   };
 
   const handleAddToCart = (product) => {
-    // Logic to add product to cart
     console.log("Adding to cart:", product);
-    navigate("/views/customer/keranjang/index.jsx");
+    navigate("/customer/keranjang");
+  };
+
+  const handleCardClick = (id) => {
+    setExpandedCard(expandedCard === id ? null : id);
+  };
+
+  const handleBackClick = () => {
+    setExpandedCard(null);
+  };
+
+  const formatRupiah = (number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(number);
   };
 
   return (
@@ -58,62 +74,138 @@ export default function BarangIndex() {
             <div className="card border-0 rounded shadow-sm">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <span className="fw-bold">Barang</span>
+                {expandedCard && (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handleBackClick}
+                  >
+                    Back
+                  </button>
+                )}
               </div>
               <div className="card-body">
                 {barang.length > 0 ? (
                   <div className="row g-3">
-                    {barang.map((barangs, index) => (
-                      <div className="col-md-4" key={index}>
-                        <div className="card h-100 shadow-sm border-0">
-                          <div className="card-body">
-                            <h5 className="card-title fw-bold">{barangs.nama}</h5>
-                            <p className="card-text mb-1">
-                              <strong>Kode:</strong> {barangs.kode}
-                            </p>
-                            <p className="card-text mb-1">
-                              <strong>Harga:</strong> Rp. {barangs.harga}
-                            </p>
-                            <p className="card-text mb-1">
-                              <strong>Stok:</strong> {barangs.stok}
-                            </p>
-                            <p className="card-text mb-1">
-                              <strong>Tag:</strong> {barangs.tag}
-                            </p>
-                            <p className="card-text mb-1">
-                              <strong>Berat:</strong> {barangs.berat} gram
-                            </p>
-                            <p className="card-text">
-                              <strong>Deskripsi:</strong> {barangs.deskripsi}
-                            </p>
-                            <p className="card-text">
-                              <strong>Detail:</strong> {barangs.detail}
-                            </p>
-                            <div className="d-flex justify-content-between align-items-center mt-3">
-                              <button
-                                className="btn btn-outline-secondary"
-                                onClick={() => handleQuantityChange(barangs.id, -1)}
-                                disabled={(quantities[barangs.id] || 0) <= 0}
+                    {barang.map((barangs, index) =>
+                      expandedCard === null || expandedCard === barangs.id ? (
+                        <div
+                          className={`col-md-${
+                            expandedCard === barangs.id ? "12" : "4"
+                          }`}
+                          key={index}
+                        >
+                          <div
+                            className={`card h-100 shadow-sm border-0 ${
+                              expandedCard === barangs.id ? "expanded" : ""
+                            }`}
+                            onClick={() => handleCardClick(barangs.id)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <div className="row g-0">
+                              <div
+                                className={`col-md-${
+                                  expandedCard === barangs.id ? "6" : "12"
+                                }`}
                               >
-                                -
-                              </button>
-                              <span>{quantities[barangs.id] || 0}</span>
-                              <button
-                                className="btn btn-outline-secondary"
-                                onClick={() => handleQuantityChange(barangs.id, 1)}
-                              >
-                                +
-                              </button>
-                              <button
-                                className="btn btn-primary"
-                                onClick={() => handleAddToCart(barangs)}
-                              >
-                                <i className="bi bi-cart"></i>
-                              </button>
+                                <div
+                                  className="card-img-top"
+                                  style={{
+                                    height:
+                                      expandedCard === barangs.id
+                                        ? "100%"
+                                        : "200px",
+                                    overflow: "hidden",
+                                  }}
+                                >
+                                  <img
+                                    src={
+                                      barangs.gambar
+                                        ? `http://localhost:8000/${barangs.gambar}`
+                                        : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
+                                    }
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                    }}
+                                    alt={barangs.nama}
+                                  />
+                                </div>
+                              </div>
+                              {expandedCard === barangs.id && (
+                                <div className="col-md-6">
+                                  <div className="card-body">
+                                    <h5 className="card-title fw-bold">
+                                      {barangs.nama}
+                                    </h5>
+                                    <p className="card-text mb-1">
+                                      <em>{barangs.tag}</em>
+                                      <br />
+                                      {formatRupiah(barangs.harga) + " / "}
+                                      <strong>{barangs.berat + " gram"}</strong>
+                                    </p>
+                                    <hr />
+                                    <p className="card-text mb-1">
+                                      {barangs.deskripsi}
+                                    </p>
+                                    <div className="card-text p-2 border rounded mb-1">
+                                      {barangs.detail}
+                                    </div>
+                                    <br />
+                                    <p className="card-text mb-1">
+                                      <strong>Stok :</strong> {barangs.stok}
+                                    </p>
+                                    <div className="d-flex align-items-center">
+                                      <button
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleQuantityChange(barangs.id, -1);
+                                        }}
+                                        disabled={quantities[barangs.id] <= 0}
+                                      >
+                                        -
+                                      </button>
+                                      <span className="mx-2">
+                                        {quantities[barangs.id] || 0}
+                                      </span>
+                                      <button
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleQuantityChange(barangs.id, 1);
+                                        }}
+                                      >
+                                        +
+                                      </button>
+                                      <button
+                                        className="btn btn-primary btn-sm ms-auto"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleAddToCart(barangs);
+                                        }}
+                                      >
+                                        Add to Cart
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {!expandedCard && (
+                                <div className="card-body">
+                                  <h5 className="card-title fw-bold">
+                                    {barangs.nama}
+                                  </h5>
+                                  <p className="card-text mb-1">
+                                    {formatRupiah(barangs.harga)}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ) : null
+                    )}
                   </div>
                 ) : (
                   <div className="alert alert-danger text-center">
