@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\Kategori;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
@@ -81,7 +82,7 @@ class BarangController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:255',
-                'gambar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'id_kategori' => 'required|exists:kategoris,id',
                 'id_supplier' => 'required|exists:suppliers,id',
                 'harga' => 'required|numeric|min:0',
@@ -92,16 +93,9 @@ class BarangController extends Controller
                 'detail' => 'required|string',
             ]);
 
-            $imageName = null;
-            if ($request->hasFile('gambar')) {
-                $imageName = time() . '.' . $request->gambar->extension();
-                $request->gambar->move(public_path('images/barang'), $imageName);
-            }
-
             $barang = Barang::create([
                 'kode' => $kode,
                 'nama' => $request->nama,
-                'gambar' => $imageName, 
                 'id_kategori' => $request->id_kategori,
                 'id_supplier' => $request->id_supplier,
                 'harga' => $request->harga,
@@ -112,10 +106,32 @@ class BarangController extends Controller
                 'detail' => $request->detail,
             ]);
 
+            if ($request->hasFile('gambar')) {
+                $relativePath = $this->saveImage($request->gambar);
+                $barang->gambar = $relativePath;
+                $barang->save();
+            }
+
             return response()->json($barang, 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
         }
+    }
+
+    private function saveImage($image)
+    {
+        $dir = 'images/barang/';
+        $fileName = time() . '.' . $image->getClientOriginalExtension();
+        $absolutePath = public_path($dir);
+        $relativePath = $dir . $fileName;
+
+        if (!File::exists($absolutePath)) {
+            File::makeDirectory($absolutePath, 0755, true);
+        }
+
+        $image->move($absolutePath, $fileName);
+
+        return $relativePath;
     }
 
     public function show($id)
@@ -146,6 +162,7 @@ class BarangController extends Controller
 
             $request->validate([
                 'nama' => 'required|string|max:255',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'id_kategori' => 'required|exists:kategoris,id',
                 'id_supplier' => 'required|exists:suppliers,id',
                 'harga' => 'required|numeric|min:0',
@@ -156,19 +173,20 @@ class BarangController extends Controller
                 'detail' => 'required|string',
             ]);
 
-            $imageName = $barang->gambar;
             if ($request->hasFile('gambar')) {
-                if ($imageName) {
-                    unlink(public_path('public/barang/' . $imageName));
+                if ($barang->gambar) {
+                    $absolutePath = public_path($barang->gambar);
+                    File::delete($absolutePath);
                 }
-
-                $imageName = time() . '.' . $request->gambar->extension();
-                $request->gambar->move(public_path('public/barang'), $imageName);
+    
+                $relativePath = $this->saveImage($request->gambar);
+                $barang->gambar = $relativePath;
+                $barang->save();
             }
 
             $barang->update([
                 'nama' => $request->nama,
-                'gambar' => $imageName,
+                'gambar' => $barang->gambar,
                 'id_kategori' => $request->id_kategori,
                 'id_supplier' => $request->id_supplier,
                 'harga' => $request->harga,

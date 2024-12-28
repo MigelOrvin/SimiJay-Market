@@ -174,8 +174,11 @@ export default function BarangIndex() {
                             <td>{barangs.detail}</td>
                             <td>
                               <img
-                                src={barangs.image}
-                                alt={barangs.nama}
+                                src={
+                                  barangs.gambar
+                                    ? `http://localhost:8000/${barangs.gambar}`
+                                    : "https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg"
+                                }
                                 style={{ width: "100px", height: "auto" }}
                               />
                             </td>
