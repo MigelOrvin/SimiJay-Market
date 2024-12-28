@@ -157,10 +157,10 @@ export default function UserIndex() {
                               <img
                                 src={
                                   users.foto
-                                    ? `http://localhost:8000/${users.foto}`
+                                    ? `/storage/fotos/${users.foto}`
                                     : "https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg"
                                 }
-                                // alt="User Profile"
+                                alt="User Profile"
                                 style={{
                                   width: "50px",
                                   height: "50px",
