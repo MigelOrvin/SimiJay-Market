@@ -2,8 +2,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Home from "../views/home";
-import Register from "../views/auth/Register";
-import Login from "../views/auth/Login";
 import Dashboard from "../views/auth/Dashboard";
 import SupplierIndex from "../views/admin/supplier";
 import SupplierCreate from "../views/admin/supplier/create";
