@@ -34,8 +34,6 @@ export default function AppRoutes() {
   return (
     <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <Login />} />
-        <Route path="/register" element={isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <Register />} />
 
         {/* Route Admin */}
         <Route path="/admin/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
