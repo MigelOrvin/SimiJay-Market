@@ -11,48 +11,51 @@ export default function UserEdit() {
 
   const { id } = useParams();
 
-  const [kode, setKode] = useState("");
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
   const [foto, setFoto] = useState(null);
 
   const fetchDetailUser = async () => {
-    await Api.get(`/api/admin/user/${id}`).then((response) => {
-      setKode(response.data.kode);
-      setNama(response.data.nama);
-      setEmail(response.data.email);
-      setPassword(response.data.password);
-      setRole(response.data.role);
-    });
+    Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    try {
+      const response = await Api.get(`/api/admin/user/${id}`);
+      const user = response.data;
+      setNama(user.nama || "");
+      setEmail(user.email || "");
+    } catch (error) {
+      console.error("Gagal mengambil data user", error);
+    }
   };
 
   useEffect(() => {
     fetchDetailUser();
-  }, []);
+  }, [id, token]);
 
   const updateUser = async (e) => {
     e.preventDefault();
 
-    Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     const formData = new FormData();
-    formData.append("kode", kode);
     formData.append("nama", nama);
     formData.append("email", email);
-    formData.append("password", password);
-    formData.append("role", role);
+    if (password) {
+      formData.append("password", password);
+    }
     if (foto) {
       formData.append("foto", foto);
     }
 
-    await Api.put(`/api/admin/user/${id}`, formData)
-      .then(() => {
-        navigate("/admin/user");
-      })
-      .catch((error) => {
-        console.error("Gagal edit data user", error);
+    Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    try {
+      await Api.put(`/api/admin/user/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      navigate("/admin/user");
+    } catch (error) {
+      console.error("Gagal edit data user", error);
+    }
   };
 
   return (
@@ -71,65 +74,36 @@ export default function UserEdit() {
                   <div className="row">
                     <div className="col-md-12">
                       <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Kode :</label>
-                        <input
-                          type="text"
-                          value={kode || ""}
-                          onChange={(e) => setKode(e.target.value)}
-                          className="form-control"
-                          disabled
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-group mb-3">
                         <label className="mb-1 fw-semibold">Nama :</label>
                         <input
                           type="text"
-                          value={nama || ""}
+                          value={nama}
                           onChange={(e) => setNama(e.target.value)}
                           className="form-control"
+                          required
                         />
                       </div>
                     </div>
-                    <div className="col-md-6">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Role :</label>
-                        <select
-                          className="form-select"
-                          value={role || ""}
-                          onChange={(e) => setRole(e.target.value)}
-                          disabled
-                        >
-                          <option value="" disabled>
-                            Pilih Role...
-                          </option>
-                          <option value="admin">Admin</option>
-                          <option value="customer">Customer</option>
-                          <option value="kasir">Kasir</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
+                    <div className="col-md-12">
                       <div className="form-group mb-3">
                         <label className="mb-1 fw-semibold">Email :</label>
                         <input
                           type="email"
-                          value={email || ""}
+                          value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="form-control"
+                          required
                         />
                       </div>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-12">
                       <div className="form-group mb-3">
                         <label className="mb-1 fw-semibold">Password :</label>
                         <input
                           type="password"
-                          value={password || ""}
+                          value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           className="form-control"
-                          placeholder=""
                         />
                       </div>
                     </div>
