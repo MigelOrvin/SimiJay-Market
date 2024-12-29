@@ -62,7 +62,9 @@ Route::middleware(['auth:sanctum', 'auth', 'cekrole:customer'])->group(function 
     Route::get('/customer/user', [UserController::class, 'profile']);
     Route::put('/customer/user/{id}', [UserController::class, 'updateProfile']);
     Route::get('/customer/keranjang', [KeranjangController::class, 'index']);
-    Route::get('/customer/transaksi', [TransaksiController::class, 'customerIndex']);
+    Route::post('/customer/transaksi', [TransaksiController::class, 'store']);
+    Route::get('/customer/transaksi/latest', [TransaksiController::class, 'latest']);
+    Route::get('/customer/transaksi', [TransaksiController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'auth', 'cekrole:kasir'])->group(function () {

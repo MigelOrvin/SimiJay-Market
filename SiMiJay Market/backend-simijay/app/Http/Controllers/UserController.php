@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -43,7 +44,7 @@ class UserController extends Controller
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string',
-                'role' => 'required|in:admin,supplier,kasir',
+                'role' => 'required|in:admin,customer,kasir',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
@@ -99,24 +100,19 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'role' => 'required|in:admin,supplier,kasir',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'password' => 'nullable|string|min:8',
         ]);
 
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-        
         $user->nama = $request->nama;
         $user->email = $request->email;
-        $user->role = $request->role;
 
-        if ($request->has('password') && $request->password) {
+        if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
@@ -128,12 +124,11 @@ class UserController extends Controller
 
             $relativePath = $this->saveImage($request->foto);
             $user->foto = $relativePath;
-            $user->save();
         }
 
         $user->save();
 
-        return response()->json($user);
+        return response()->json(['message' => 'Berhasil di Edit', 'user' => $user]);
     }
 
     public function updateProfile(Request $request, $id)

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('transaksi_id');
             $table->unsignedBigInteger('barang_id');
             $table->integer('jumlah');
+            $table->float('harga');
             $table->float('subtotal');
             $table->timestamps();
 

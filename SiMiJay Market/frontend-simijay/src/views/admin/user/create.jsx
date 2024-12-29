@@ -24,20 +24,21 @@ export default function UserCreate() {
     formData.append("email", email);
     formData.append("password", password);
     formData.append("role", role);
-    formData.append("foto", foto);
+    if (foto) {
+      formData.append("foto", foto);
+    }
 
     Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    await Api.post("/api/admin/user/store", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-      .then(() => {
-        navigate("/admin/user");
-      })
-      .catch((error) => {
-        console.error("Gagal menambahkan user", error);
+    try {
+      await Api.post("/api/admin/user/store", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      navigate("/admin/user");
+    } catch (error) {
+      console.error("Gagal menambahkan user", error);
+    }
   };
 
   return (
@@ -62,24 +63,8 @@ export default function UserCreate() {
                           value={nama}
                           onChange={(e) => setNama(e.target.value)}
                           className="form-control"
+                          required
                         />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Role :</label>
-                        <select
-                          className="form-select"
-                          value={role}
-                          onChange={(e) => setRole(e.target.value)}
-                        >
-                          <option value="" disabled>
-                            Pilih Role...
-                          </option>
-                          <option value="admin">Admin</option>
-                          <option value="customer">Customer</option>
-                          <option value="kasir">Kasir</option>
-                        </select>
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -90,6 +75,7 @@ export default function UserCreate() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="form-control"
+                          required
                         />
                       </div>
                     </div>
@@ -101,10 +87,29 @@ export default function UserCreate() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           className="form-control"
+                          required
                         />
                       </div>
                     </div>
-                    <div>
+                    <div className="col-md-6">
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Role :</label>
+                        <select
+                          className="form-select"
+                          value={role}
+                          onChange={(e) => setRole(e.target.value)}
+                          required
+                        >
+                          <option value="" disabled>
+                            Pilih Role...
+                          </option>
+                          <option value="admin">Admin</option>
+                          <option value="customer">Customer</option>
+                          <option value="kasir">Kasir</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="col-md-12">
                       <div className="form-group mb-3">
                         <label className="mb-1 fw-semibold">Foto :</label>
                         <input

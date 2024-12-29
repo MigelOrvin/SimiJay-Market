@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import Api from "../../../services/api";
 import Navbar from "../../../components/Navbar";
 import SidebarMenu from "../../../components/SidebarMenu";
-import { useNavigate } from "react-router-dom";
 
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [expandedCard, setExpandedCard] = useState(null);
-  const navigate = useNavigate();
 
   const fetchDataBarang = async () => {
     const token = localStorage.getItem("token");
@@ -34,20 +32,30 @@ export default function BarangIndex() {
     fetchDataBarang();
   }, []);
 
-  const handleQuantityChange = (id, delta) => {
+  const handleQuantityChange = (id, delta, event) => {
+    event.stopPropagation();
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [id]: (prevQuantities[id] || 0) + delta,
     }));
   };
 
-  const handleAddToCart = (product) => {
-    console.log("Adding to cart:", product);
-    navigate("/customer/keranjang");
+  const handleAddToCart = (id, event) => {
+    event.stopPropagation();
+    const cart = JSON.parse(localStorage.getItem("cart")) || {};
+    cart[id] = (cart[id] || 0) + (quantities[id] || 0);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [id]: 0,
+    }));
+    alert("Item added to cart");
   };
 
   const handleCardClick = (id) => {
-    setExpandedCard(expandedCard === id ? null : id);
+    if (barang.find((item) => item.id === id).stok > 0) {
+      setExpandedCard(expandedCard === id ? null : id);
+    }
   };
 
   const handleBackClick = () => {
@@ -97,10 +105,29 @@ export default function BarangIndex() {
                           <div
                             className={`card h-100 shadow-sm border-0 ${
                               expandedCard === barangs.id ? "expanded" : ""
-                            }`}
+                            } ${barangs.stok === 0 ? "text-muted" : ""}`}
                             onClick={() => handleCardClick(barangs.id)}
-                            style={{ cursor: "pointer" }}
+                            style={{
+                              cursor: barangs.stok > 0 ? "pointer" : "not-allowed",
+                              position: "relative",
+                            }}
                           >
+                            {barangs.stok === 0 && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "50%",
+                                  left: "50%",
+                                  transform: "translate(-50%, -50%)",
+                                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                                  padding: "10px",
+                                  borderRadius: "5px",
+                                  zIndex: 1,
+                                }}
+                              >
+                                <strong>Produk Habis</strong>
+                              </div>
+                            )}
                             <div className="row g-0">
                               <div
                                 className={`col-md-${
@@ -115,6 +142,7 @@ export default function BarangIndex() {
                                         ? "100%"
                                         : "200px",
                                     overflow: "hidden",
+                                    filter: barangs.stok === 0 ? "grayscale(100%)" : "none",
                                   }}
                                 >
                                   <img
@@ -158,10 +186,9 @@ export default function BarangIndex() {
                                     <div className="d-flex align-items-center">
                                       <button
                                         className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleQuantityChange(barangs.id, -1);
-                                        }}
+                                        onClick={(event) =>
+                                          handleQuantityChange(barangs.id, -1, event)
+                                        }
                                         disabled={quantities[barangs.id] <= 0}
                                       >
                                         -
@@ -171,19 +198,18 @@ export default function BarangIndex() {
                                       </span>
                                       <button
                                         className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleQuantityChange(barangs.id, 1);
-                                        }}
+                                        onClick={(event) =>
+                                          handleQuantityChange(barangs.id, 1, event)
+                                        }
                                       >
                                         +
                                       </button>
                                       <button
                                         className="btn btn-primary btn-sm ms-auto"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleAddToCart(barangs);
-                                        }}
+                                        onClick={(event) =>
+                                          handleAddToCart(barangs.id, event)
+                                        }
+                                        disabled={quantities[barangs.id] <= 0}
                                       >
                                         Add to Cart
                                       </button>
