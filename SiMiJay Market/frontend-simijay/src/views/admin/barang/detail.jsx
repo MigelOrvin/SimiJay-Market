@@ -1,129 +1,181 @@
 import { useEffect, useState } from "react";
 import Api from "../../../services/api";
-import Navbar from "../../../components/Navbar";
-import SidebarMenu from "../../../components/SidebarMenu";
-import { Link } from "react-router-dom";
+import SidebarMenu from "../../../components/SidebarMenu"; // Ensure this path is correct
+import { Link, useParams } from "react-router-dom";
 
-export default function BarangIndex() {
+export default function BarangDetail() {
+  const { id } = useParams();
+
   const [barang, setBarang] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [kategori, setKategori] = useState([]);
+  const [supplier, setSupplier] = useState([]);
+  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
 
-  const fetchDataBarang = async () => {
+  const fetchDetailBarang = async () => {
     const token = localStorage.getItem("token");
 
     if (token) {
       Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       try {
-        const response = await Api.get("/api/admin/barang");
+        const response = await Api.get(`/api/admin/barang/${id}`);
+
         setBarang(response.data.data.barang);
+        setKategori(response.data.data.kategori);
+        setSupplier(response.data.data.supplier);
       } catch (error) {
-        console.error(
-          "Terjadi error ketika fetching data barang:",
-          error.response ? error.response.data : error.message
-        );
+        console.error(error);
       }
-    } else {
-      console.error("Token invalid");
     }
   };
 
   useEffect(() => {
-    fetchDataBarang();
-  }, []);
+    fetchDetailBarang(id);
+  }, [id]);
 
-  const formatRupiah = (number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(number);
+  const getKategoriName = (id_kategori) => {
+    const kat = kategori.find((k) => k.id === id_kategori);
+    return kat ? kat.nama : "Null";
   };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+  const getSupplierName = (id_supplier) => {
+    const sup = supplier.find((s) => s.id === id_supplier);
+    return sup ? sup.nama : "Null";
   };
 
-  const filteredBarang = barang.filter((barangs) =>
-    barangs.nama.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleToggleSidebar = (isActive) => {
+    setIsSidebarActive(isActive);
+  };
 
   return (
     <>
-      <Navbar />
-      <div className="container mt-5 mb-5">
-        <div className="row">
-          <div className="col-md-3">
-            <SidebarMenu />
-          </div>
-          <div className="col-md-9">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h4 className="fw-bold">DATA BARANG</h4>
-              <div className="d-flex">
-                <input
-                  type="text"
-                  className="form-control form-control-sm me-2"
-                  placeholder="Cari Nama Produk"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                />
-                <Link
-                  to={`/admin/barang`}
-                  className="btn btn-sm btn-info text-white rounded-sm border-0"
-                >
-                  Kembali
-                </Link>
-              </div>
-            </div>
-            <div className="card border-0 rounded shadow-sm">
-              <div className="card-body">
-                {filteredBarang.length > 0 ? (
-                  filteredBarang.map((barangs, index) => (
-                    <div key={index} className="card mb-3">
-                      <div className="row g-0">
-                        <div className="col-md-4">
-                          <img
-                            src={
-                              barangs.gambar
-                                ? `http://localhost:8000/${barangs.gambar}`
-                                : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
-                            }
-                            className="img-fluid rounded-start h-100"
-                            alt={barangs.nama}
-                            style={{ objectFit: "cover" }}
-                          />
-                        </div>
-                        <div className="col-md-8">
-                          <div className="card-body">
-                            <h5 className="card-title fw-bold d-flex justify-content-between">
-                              {barangs.nama}
-                              <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                                Stok : {barangs.stok}
-                              </span>
-                            </h5>
-                            <p className="card-text mb-1">
-                              <em>{barangs.tag}</em>
-                              <br />
-                              {formatRupiah(barangs.harga)} /{" "}
-                              <strong>{barangs.berat} gram</strong>
-                            </p>
-                            <hr />
-                            <p className="card-text mb-1">
-                              {barangs.deskripsi}
-                            </p>
-                            <div className="card-text p-2 border rounded mb-1">
-                              {barangs.detail}
-                            </div>
-                          </div>
-                        </div>
+      <SidebarMenu onToggleSidebar={handleToggleSidebar} />
+      <div className={`main ${isSidebarActive ? "active" : ""}`}>
+        <div className="container mb-5 mt-5">
+          <div className="row">
+            <div className="col-md-6 offset-md-3">
+              <div className="card border-0 rounded shadow-sm">
+                <div className="card-header fw-bold">Detail Barang</div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-md-6 d-flex align-items-center justify-content-center">
+                      <img
+                        src={barang.gambar}
+                        alt="Barang"
+                        className="img-fluid rounded-circle"
+                        style={{
+                          width: "200px",
+                          height: "200px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Kode :</label>
+                        <input
+                          type="text"
+                          value={barang.kode}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Nama Barang :</label>
+                        <input
+                          type="text"
+                          value={barang.nama}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Kategori :</label>
+                        <input
+                          type="text"
+                          value={getKategoriName(barang.id_kategori)}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Supplier :</label>
+                        <input
+                          type="text"
+                          value={getSupplierName(barang.id_supplier)}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Harga :</label>
+                        <input
+                          type="text"
+                          value={barang.harga}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Stok :</label>
+                        <input
+                          type="text"
+                          value={barang.stok}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Tag :</label>
+                        <input
+                          type="text"
+                          value={barang.tag}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">Berat :</label>
+                        <input
+                          type="text"
+                          value={barang.berat}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">
+                          Deskripsi Barang :
+                        </label>
+                        <input
+                          type="text"
+                          value={barang.deskripsi}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label className="mb-1 fw-semibold">
+                          Detail Barang :
+                        </label>
+                        <input
+                          type="text"
+                          value={barang.detail}
+                          className="form-control"
+                          disabled
+                        />
+                      </div>
+                      <div className="col-md-12">
+                        <Link
+                          to="/admin/barang"
+                          className="btn btn-sm btn-secondary"
+                        >
+                          Kembali
+                        </Link>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="alert alert-danger mb-0">
-                    Loading ...
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

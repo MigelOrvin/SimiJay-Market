@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Api from "../../../services/api";
-import Navbar from "../../../components/Navbar";
 import SidebarMenu from "../../../components/SidebarMenu";
 
 const Transaksi = () => {
   const [transaksi, setTransaksi] = useState([]);
   const [totalPengeluaran, setTotalPengeluaran] = useState(0);
   const [produkTerjual, setProdukTerjual] = useState([]);
+  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
 
   useEffect(() => {
     const fetchTransaksi = async () => {
@@ -48,6 +48,10 @@ const Transaksi = () => {
     fetchTransaksi();
   }, []);
 
+  const handleToggleSidebar = (isActive) => {
+    setIsSidebarActive(isActive);
+  };
+
   const formatRupiah = (number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -58,35 +62,52 @@ const Transaksi = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="container mt-5 mb-5">
-        <div className="row">
-          <div className="col-md-3">
-            <SidebarMenu />
-          </div>
-          <div className="col-md-9">
-            <h1>Laporan Transaksi</h1>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Nama Produk</th>
-                  <th>Jumlah Terjual</th>
-                  <th>Harga per Produk</th>
-                  <th>Total Harga per Produk</th>
-                </tr>
-              </thead>
-              <tbody>
-                {produkTerjual.map((produk, index) => (
-                  <tr key={index}>
-                    <td>{produk.nama}</td>
-                    <td>{produk.jumlah}</td>
-                    <td>{formatRupiah(produk.harga)}</td>
-                    <td>{formatRupiah(produk.totalHarga)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <h2>Total Keseluruhan: {formatRupiah(totalPengeluaran)}</h2>
+      <SidebarMenu onToggleSidebar={handleToggleSidebar} />
+      <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
+        <div className="container mt-5 mb-5">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="row">
+                <div className="col-md-4">
+                  <div className="card border-0 rounded shadow-sm mb-4">
+                    <div className="card-body">
+                      <h4>Total Pengeluaran</h4>
+                      <h5>{formatRupiah(totalPengeluaran)}</h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="card border-0 rounded shadow-sm mb-4">
+                    <div className="card-body">
+                      <h1>Laporan Transaksi</h1>
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>Nama Produk</th>
+                            <th>Jumlah Terjual</th>
+                            <th>Harga per Produk</th>
+                            <th>Total Harga per Produk</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {produkTerjual.map((produk, index) => (
+                            <tr key={index}>
+                              <td>{produk.nama}</td>
+                              <td>{produk.jumlah}</td>
+                              <td>{formatRupiah(produk.harga)}</td>
+                              <td>{formatRupiah(produk.totalHarga)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <h2>Total Keseluruhan: {formatRupiah(totalPengeluaran)}</h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
