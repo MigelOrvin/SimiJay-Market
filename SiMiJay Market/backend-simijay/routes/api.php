@@ -69,9 +69,9 @@ Route::middleware(['auth:sanctum', 'auth', 'cekrole:customer'])->group(function 
 
 Route::middleware(['auth:sanctum', 'auth', 'cekrole:kasir'])->group(function () {
     Route::get('/kasir/barang', [BarangController::class, 'kasirIndex']);
-    Route::get('/kasir/keranjang', [KeranjangController::class, 'index']);
-    Route::get('/kasir/transaksi', [TransaksiController::class, 'index']);
-    Route::post('/kasir/transaksi/store', [TransaksiController::class, 'store']);
-    Route::put('/kasir/transaksi/{id}', [TransaksiController::class, 'update']);
-    Route::get('/kasir/laporan', [LaporanController::class, 'index']);
+    Route::get('/kasir/keranjang', [KeranjangController::class, 'kasirIndex']);
+    Route::post('/kasir/transaksi', [TransaksiController::class, 'kasirStore']);
+    Route::get('/kasir/transaksi/latest', [TransaksiController::class, 'kasirLatest']);
+    Route::get('/kasir/transaksi', [TransaksiController::class, 'kasirIndex']);
+    Route::get('/kasir/laporan', [TransaksiController::class, 'laporan']);
 });

@@ -7,6 +7,7 @@ export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [expandedCard, setExpandedCard] = useState(null);
+  const [warning, setWarning] = useState({});
 
   const fetchDataBarang = async () => {
     const token = localStorage.getItem("token");
@@ -34,10 +35,29 @@ export default function BarangIndex() {
 
   const handleQuantityChange = (id, delta, event) => {
     event.stopPropagation();
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: (prevQuantities[id] || 0) + delta,
-    }));
+    setQuantities((prevQuantities) => {
+      const newQuantity = (prevQuantities[id] || 0) + delta;
+      if (newQuantity > barang.find((item) => item.id === id).stok) {
+        setWarning((prevWarning) => ({
+          ...prevWarning,
+          [id]: `Mohon maaf stok tersisa ${barang.find((item) => item.id === id).stok}`,
+        }));
+        setTimeout(() => {
+          setWarning((prevWarning) => ({
+            ...prevWarning,
+            [id]: null,
+          }));
+        }, 1000);
+        return prevQuantities;
+      }
+      if (newQuantity < 0) {
+        return prevQuantities;
+      }
+      return {
+        ...prevQuantities,
+        [id]: newQuantity,
+      };
+    });
   };
 
   const handleAddToCart = (id, event) => {
@@ -214,6 +234,11 @@ export default function BarangIndex() {
                                         Add to Cart
                                       </button>
                                     </div>
+                                    {warning[barangs.id] && (
+                                      <p className="text-danger mt-2">
+                                        {warning[barangs.id]}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               )}

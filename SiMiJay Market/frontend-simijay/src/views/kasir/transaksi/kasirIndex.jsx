@@ -18,7 +18,7 @@ const Transaksi = () => {
       Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       try {
-        const response = await Api.get("/api/customer/transaksi");
+        const response = await Api.get("/api/kasir/transaksi");
         setTransaksi(response.data.transaksi);
         const total = response.data.transaksi.reduce((sum, trans) => sum + trans.total_harga, 0);
         setTotalPengeluaran(total);

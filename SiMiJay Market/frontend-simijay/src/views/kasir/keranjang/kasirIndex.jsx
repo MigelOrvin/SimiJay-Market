@@ -108,12 +108,12 @@ function KeranjangIndex() {
           jumlah: quantities[id],
         }));
 
-      await Api.post("/api/customer/transaksi", {
+      await Api.post("/api/kasir/transaksi", {
         user_id: userId,
         items,
       });
       localStorage.removeItem("cart");
-      navigate("/customer/transaksi");
+      navigate("/kasir/transaksi");
     } catch (error) {
       console.error("Gagal melakukan transaksi:", error.response ? error.response.data : error.message);
     }
