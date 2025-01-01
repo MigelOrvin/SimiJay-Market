@@ -22,10 +22,9 @@ import ProfileIndex  from "../views/customer/profile/index";
 import ProfileEdit  from "../views/customer/profile/edit";
 import CustomerTransaksiIndex  from "../views/customer/transaksi/index";
 import BarangKasirIndex  from "../views/kasir/barang/kasirIndex";
-import LaporanIndex  from "../views/kasir/laporan/index";
-import TransaksiIndex  from "../views/kasir/transaksi/index";
-import TransaksiCreate  from "../views/kasir/transaksi/create";
-import TransaksiEdit  from "../views/kasir/transaksi/edit";
+import KeranjangKasirIndex  from "../views/kasir/keranjang/kasirIndex";
+import TransaksiKasirIndex  from "../views/kasir/transaksi/kasirIndex";
+import TransaksiLaporan  from "../views/kasir/laporan/index";
 
 export default function AppRoutes() {
 
@@ -82,15 +81,13 @@ export default function AppRoutes() {
         <Route path="/kasir/barang" element={isAuthenticated ? <BarangKasirIndex /> : <Navigate to="/login" replace />} />
 
         {/* Route Kasir Keranjang */}
-        <Route path="/kasir/keranjang" element={isAuthenticated ? <KeranjangIndex /> : <Navigate to="/login" replace />} />
+        <Route path="/kasir/keranjang" element={isAuthenticated ? <KeranjangKasirIndex /> : <Navigate to="/login" replace />} />
 
         {/* Route Kasir Transaksi*/}
-        <Route path="/kasir/transaksi" element={isAuthenticated ? <TransaksiIndex /> : <Navigate to="/login" replace />} />
-        <Route path="/kasir/transaksi/create" element={isAuthenticated ? <TransaksiCreate /> : <Navigate to="/login" replace />} />
-        <Route path="/kasir/transaksi/edit/:id" element={isAuthenticated ? <TransaksiEdit /> : <Navigate to="/login" replace />} />
+        <Route path="/kasir/transaksi" element={isAuthenticated ? <TransaksiKasirIndex /> : <Navigate to="/login" replace />} />\
 
         {/* Route Kasir Laporan*/}
-        <Route path="/kasir/laporan" element={isAuthenticated ? <LaporanIndex /> : <Navigate to="/login" replace />} />
+        <Route path="/kasir/laporan" element={isAuthenticated ? <TransaksiLaporan /> : <Navigate to="/login" replace />} />
     </Routes>
   );
 }

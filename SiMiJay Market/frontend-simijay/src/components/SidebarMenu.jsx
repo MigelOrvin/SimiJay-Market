@@ -100,6 +100,12 @@ export default function SidebarMenu() {
               Barang
             </Link>
             <Link
+              to="/kasir/keranjang"
+              className="list-group-item list-group-item-action"
+            >
+              Keranjang
+            </Link>
+            <Link
               to="/kasir/transaksi"
               className="list-group-item list-group-item-action"
             >

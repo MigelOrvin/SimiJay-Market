@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Keranjang;
-use App\Models\Transaksi;
-use App\Models\Laporan;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 
@@ -24,5 +22,25 @@ class KeranjangController extends Controller
 
         Keranjang::create($data);
         return response()->json(['message' => 'Item added to cart successfully.']);
+    }
+
+    public function index(Request $request)
+    {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $keranjang = Keranjang::where('user_id', $data['user_id'])->get();
+        return response()->json(['keranjang' => $keranjang]);
+    }
+
+    public function kasirIndex(Request $request)
+    {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $keranjang = Keranjang::where('user_id', $data['user_id'])->get();
+        return response()->json(['keranjang' => $keranjang]);
     }
 }
