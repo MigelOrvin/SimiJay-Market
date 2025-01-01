@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import Api from "../../../services/api";
-import Navbar from "../../../components/Navbar";
+
 import SidebarMenu from "../../../components/SidebarMenu";
 import { useNavigate } from "react-router-dom";
 
 function KeranjangIndex() {
   const [barang, setBarang] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
   const navigate = useNavigate();
 
   const fetchDataBarang = async () => {
@@ -80,54 +81,57 @@ function KeranjangIndex() {
     return total + item.harga * quantity;
   }, 0);
 
+  const handleToggleSidebar = (isActive) => {
+    setIsSidebarActive(isActive);
+  };
+
   return (
     <>
-      <Navbar />
-      <div className="container mt-5 mb-5">
-        <div className="row">
-          <div className="col-md-3">
-            <SidebarMenu />
-          </div>
-          <div className="col-md-9">
-            <div className="card border-0 rounded shadow-sm">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Keranjang</span>
-              </div>
-              <div className="card-body">
-                {Object.keys(quantities).length > 0 ? (
-                  <div className="row g-3">
-                    {barang.map((item) => {
-                      const quantity = quantities[item.id] || 0;
-                      if (quantity > 0) {
-                        return (
-                          <div className="col-md-12" key={item.id}>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span>{item.nama}</span>
-                              <span>{quantity}</span>
-                              <span>Rp. {item.harga * quantity}</span>
+      <SidebarMenu onToggleSidebar={handleToggleSidebar} />
+      <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
+        <div className="container mt-5 mb-5">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="card border-0 rounded shadow-sm">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                  <span className="fw-bold">Keranjang</span>
+                </div>
+                <div className="card-body">
+                  {Object.keys(quantities).length > 0 ? (
+                    <div className="row g-3">
+                      {barang.map((item) => {
+                        const quantity = quantities[item.id] || 0;
+                        if (quantity > 0) {
+                          return (
+                            <div className="col-md-12" key={item.id}>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <span>{item.nama}</span>
+                                <span>{quantity}</span>
+                                <span>Rp. {item.harga * quantity}</span>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                    <div className="col-md-12 mt-3">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <span className="fw-bold">Total Harga</span>
-                        <span className="fw-bold">Rp. {totalHarga}</span>
+                          );
+                        }
+                        return null;
+                      })}
+                      <div className="col-md-12 mt-3">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span className="fw-bold">Total Harga</span>
+                          <span className="fw-bold">Rp. {totalHarga}</span>
+                        </div>
+                      </div>
+                      <div className="col-md-12 mt-3 text-end">
+                        <button className="btn btn-primary" onClick={handleCheckout}>
+                          Beli
+                        </button>
                       </div>
                     </div>
-                    <div className="col-md-12 mt-3 text-end">
-                      <button className="btn btn-primary" onClick={handleCheckout}>
-                        Beli
-                      </button>
+                  ) : (
+                    <div className="alert alert-danger text-center">
+                      Keranjang kosong!
                     </div>
-                  </div>
-                ) : (
-                  <div className="alert alert-danger text-center">
-                    Keranjang kosong!
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>

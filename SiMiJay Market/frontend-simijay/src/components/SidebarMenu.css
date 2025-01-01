@@ -1,0 +1,202 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap");
+
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  z-index: 4; 
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f5f5;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px; /* Adjust width to accommodate menu outline icon */
+  background: #ffffff; /* Change background to white */
+  padding: 6px;
+  height: 100%;
+  box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1); /* Add box shadow */
+  transition: all .5s ease;
+  
+  z-index: 1;
+  overflow-x: hidden; /* Hide horizontal scroll */
+  
+}
+.sidebar .links_name{
+  transition: all .5s ease;
+}
+.sidebar.active {
+  width: 80px;
+  z-index: 7;
+  overflow-x: visible; 
+}
+.sidebar.active .links_name{
+  display: none;
+}
+.sidebar .logo_content .logo {
+  display: flex;
+  height: 50px;
+  width: 100%;
+  font-size: 30px;
+  align-items: center;
+  pointer-events: none;
+  justify-content: space-between;
+  opacity: 1; /* Ensure the logo is visible */
+  transition: opacity 0.5s ease;
+}
+
+.sidebar.active .logo_content .logo {
+  opacity: 1; /* Ensure the logo remains visible */
+}
+
+.sidebar .logo_content .logo .logo_name {
+  font-size: 23px;
+  font-weight: 600;
+  margin: 0 10px;
+  color: #39829b; /* Change text color to match sidebar */
+}
+
+.sidebar.active .logo_content .logo .logo_name {
+  display: none; /* Hide the logo name when the sidebar is collapsed */
+}
+
+.sidebar #btn {
+  position: absolute;
+  color: #39829b; /* Change toggle button color to blue */
+  left: 85%; /* Adjusted to position to the right of "SiMiJay Market" */
+  top: 6px;
+  font-size: 20px;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 50px;
+  transform: translate(-50%);
+}
+
+.sidebar.active #btn {
+  left: 50%;
+}
+
+.sidebar i {
+  height: 50px;
+  min-width: 50px;
+  border-radius: 12px;
+  line-height: 50px;
+  text-align: center;
+  font-size: 25px;
+  color: #808080; /* Change icons color to gray */
+}
+
+.sidebar ul {
+  margin-top: 20px;
+  padding-left: 13%;
+}
+
+.sidebar ul li {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  list-style: none;
+  align-items: start;
+  line-height: 50px;
+}
+
+.sidebar ul li a {
+  color: #808080; /* Change link color to gray */
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+  border-radius: 20px;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all .5s ease;
+}
+
+.sidebar ul li a.logout {
+  color: #808080; /* Change logout text color to red */
+}
+
+.sidebar ul li a.logout:hover {
+  color: #c51616; /* Ensure logout text color remains red on hover */
+  background: #ffe6e6; /* Change hover background to a light red */
+}
+
+.sidebar ul li a:hover {
+  color: #39829b; /* Change hover text color to blue */
+  background: #e0f7fa; /* Change hover background to a lighter blue */
+}
+
+.sidebar ul li a:hover i {
+  color: #39829b; /* Change icon color to blue on hover */
+}
+
+.sidebar .link_name {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.5s ease;
+}
+
+.sidebar.active .link_name {
+  display: inline; /* Ensure the link names remain visible */
+  opacity: 1; /* Ensure the link names remain visible */
+  pointer-events: auto; /* Ensure the link names are clickable */
+}
+
+.sidebar ul li .tooltip {
+  position: absolute;
+  left: 130px;
+  top: 0;
+  transform: translate(-45%, -50%);
+  border-radius: 10px;
+  height: 35px;
+  width: 130px;
+  background: #ffffff;
+  line-height: 35px;
+  text-align: center;
+  font-size: 13px;
+  color: black;
+  box-shadow: 0 5px 10px rgb(0, 0, 0, 0.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: all .5s ease;
+  visibility: hidden; /* Ensure the tooltip is hidden */
+}
+
+.sidebar.active ul li:hover .tooltip{
+  opacity: 1;
+  z-index: 3;
+  top: 50%;
+  visibility: visible;
+}
+
+
+.home_content {
+  position: absolute; /* Change to absolute to stay behind the sidebar */
+  height: 100%;
+  width: calc(100% - 260px); /* Adjust width to blend with sidebar */
+  left: 260px; /* Adjust left to blend with sidebar */
+  transition: all .5s ease;
+  z-index: 4; /* Ensure the home content stays behind the sidebar */
+}
+.home_content.active{
+  width: calc(100% - 80px); /* Adjust width to blend with sidebar */
+}
+
+
+
+.home_content .text {
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.sidebar.active ~ .home_content {
+  left: 80px; /* Adjust left for active state */
+  
+}
