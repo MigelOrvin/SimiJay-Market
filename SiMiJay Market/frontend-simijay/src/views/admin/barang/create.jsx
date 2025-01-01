@@ -98,7 +98,7 @@ export default function BarangCreate() {
     return (
         <>
             <SidebarMenu onToggleSidebar={handleToggleSidebar} />
-            <div className={`main ${isSidebarActive ? "active" : ""}`}>
+            <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
                 <div className="container mb-5 mt-5">
                     <div className="row">
                         <div className="col-md-12">

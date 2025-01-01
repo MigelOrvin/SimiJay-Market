@@ -68,16 +68,6 @@ const Transaksi = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="row">
-                <div className="col-md-4">
-                  <div className="card border-0 rounded shadow-sm mb-4">
-                    <div className="card-body">
-                      <h4>Total Pengeluaran</h4>
-                      <h5>{formatRupiah(totalPengeluaran)}</h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="row">
                 <div className="col-md-12">
                   <div className="card border-0 rounded shadow-sm mb-4">
                     <div className="card-body">
