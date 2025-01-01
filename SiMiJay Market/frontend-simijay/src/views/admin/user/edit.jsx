@@ -2,19 +2,17 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu";
-import Navbar from "../../../components/Navbar";
 
 export default function UserEdit() {
   const token = localStorage.getItem("token");
-
   const navigate = useNavigate();
-
   const { id } = useParams();
-
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [foto, setFoto] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
+  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
 
   const fetchDetailUser = async () => {
     Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -52,79 +50,86 @@ export default function UserEdit() {
           "Content-Type": "multipart/form-data",
         },
       });
+      setSuccessMessage("User berhasil diupdate"); // Set success message on update
       navigate("/admin/user");
     } catch (error) {
       console.error("Gagal edit data user", error);
     }
   };
 
+  const handleToggleSidebar = (isActive) => {
+    setIsSidebarActive(isActive);
+  };
+
   return (
     <>
-      <Navbar />
-      <div className="container mb-5 mt-5">
-        <div className="row">
-          <div className="col-md-3">
-            <SidebarMenu />
-          </div>
-          <div className="col-md-9">
-            <div className="card border-0 rounded shadow-sm">
-              <div className="card-header fw-bold">Edit User</div>
-              <div className="card-body">
-                <form onSubmit={updateUser}>
-                  <div className="row">
-                    <div className="col-md-12">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Nama :</label>
-                        <input
-                          type="text"
-                          value={nama}
-                          onChange={(e) => setNama(e.target.value)}
-                          className="form-control"
-                          required
-                        />
+      <SidebarMenu onToggleSidebar={handleToggleSidebar} />
+      <div className={`main ${isSidebarActive ? "active" : ""}`}>
+        <div className="container mb-5 mt-5">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="card border-0 rounded shadow-sm">
+                <div className="card-header fw-bold">Edit User</div>
+                <div className="card-body">
+                  {successMessage && (
+                    <div className="alert alert-success">{successMessage}</div>
+                  )} {/* Display success message */}
+                  <form onSubmit={updateUser}>
+                    <div className="row">
+                      <div className="col-md-12">
+                        <div className="form-group mb-3">
+                          <label className="mb-1 fw-semibold">Nama :</label>
+                          <input
+                            type="text"
+                            value={nama}
+                            onChange={(e) => setNama(e.target.value)}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group mb-3">
+                          <label className="mb-1 fw-semibold">Email :</label>
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group mb-3">
+                          <label className="mb-1 fw-semibold">Password :</label>
+                          <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="form-control"
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group mb-3">
+                          <label className="mb-1 fw-semibold">Foto :</label>
+                          <input
+                            type="file"
+                            onChange={(e) => setFoto(e.target.files[0])}
+                            className="form-control"
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="col-md-12">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Email :</label>
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="form-control"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-12">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Password :</label>
-                        <input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="form-control"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-12">
-                      <div className="form-group mb-3">
-                        <label className="mb-1 fw-semibold">Foto :</label>
-                        <input
-                          type="file"
-                          onChange={(e) => setFoto(e.target.files[0])}
-                          className="form-control"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <button type="submit" className="btn btn-sm btn-primary">
-                    Simpan
-                  </button>
-                  <Link to="/admin/user" className="mx-2 btn btn-sm btn-secondary">
-                    Kembali
-                  </Link>
-                </form>
+                    <button type="submit" className="btn btn-sm btn-primary">
+                      Simpan
+                    </button>
+                    <Link to="/admin/user" className="mx-2 btn btn-sm btn-secondary">
+                      Kembali
+                    </Link>
+                  </form>
+                </div>
               </div>
             </div>
           </div>

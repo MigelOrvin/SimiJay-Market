@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import Api from "../../../services/api";
-import Navbar from "../../../components/Navbar";
-import SidebarMenu from "../../../components/SidebarMenu";
+import SidebarMenu from "../../../components/SidebarMenu"; // Ensure this path is correct
 import { Link } from "react-router-dom";
 
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+
+  const handleToggleSidebar = (isActive) => {
+    setIsSidebarActive(isActive);
+  };
 
   const fetchDataBarang = async () => {
     const token = localStorage.getItem("token");
@@ -32,14 +35,6 @@ export default function BarangIndex() {
     fetchDataBarang();
   }, []);
 
-  const formatRupiah = (number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(number);
-  };
-
   const deleteBarang = async (id) => {
     const token = localStorage.getItem("token");
 
@@ -57,41 +52,16 @@ export default function BarangIndex() {
     }
   };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredBarang = barang.filter((barangs) =>
-    barangs.nama.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
   return (
     <>
-      <Navbar />
-      <div className="container mt-5 mb-5">
-        <div className="row">
-          <div className="col-md-3">
-            <SidebarMenu />
-          </div>
-          <div className="col-md-9">
-            <div className="card border-0 rounded shadow-sm">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <span className="fw-bold me-3">Barang</span>
-                <input
-                  type="text"
-                  className="form-control form-control-sm"
-                  style={{ width: "200px" }}
-                  placeholder="Cari Nama Produk"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                />
-                <div className="d-flex">
-                  <Link
-                    to={`/admin/barang/detail`}
-                    className="btn btn-sm btn-info text-white rounded-sm border-0 me-2"
-                  >
-                    Lihat Barang
-                  </Link>
+      <SidebarMenu onToggleSidebar={handleToggleSidebar} />
+      <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
+        <div className="container mt-5 mb-5">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="card border-0 rounded shadow-sm">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                  <span className="fw-bold">Barang</span>
                   <Link
                     to="/admin/barang/create"
                     className="btn btn-sm btn-success rounded shadow-sm border-0"
@@ -99,149 +69,155 @@ export default function BarangIndex() {
                     Tambah Barang
                   </Link>
                 </div>
-              </div>
-              <div className="card-body">
-                <div
-                  className="table-wrapper"
-                  style={{
-                    overflowX: "auto",
-                    maxWidth: "100%",
-                    paddingBottom: "10px",
-                  }}
-                >
-                  <table
-                    className="table table-bordered"
-                    style={{ minWidth: "1500px" }}
+                <div className="card-body">
+                  <div
+                    className="table-wrapper"
+                    style={{
+                      overflowX: "auto",
+                      maxWidth: "100%",
+                      paddingBottom: "10px",
+                    }}
                   >
-                    <thead className="bg-primary text-white">
-                      <tr>
-                        <th
-                          scope="col"
-                          className="text-center fw-semibold"
-                          style={{ width: "1%" }}
-                        >
-                          No
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "2%" }}
-                        >
-                          Kode
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "8%" }}
-                        >
-                          Nama
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "7%" }}
-                        >
-                          Harga
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "2%" }}
-                        >
-                          Stok
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "4%" }}
-                        >
-                          Tag
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "6%" }}
-                        >
-                          Berat
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "20%" }}
-                        >
-                          Deskripsi
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "10%" }}
-                        >
-                          Detail
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold"
-                          style={{ width: "10%" }}
-                        >
-                          Gambar
-                        </th>
-                        <th
-                          scope="col"
-                          className="fw-semibold text-center"
-                          style={{ width: "10%" }}
-                        ></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredBarang.length > 0 ? (
-                        filteredBarang.map((barangs, index) => (
-                          <tr key={index}>
-                            <td className="text-center">{index + 1}</td>
-                            <td>{barangs.kode}</td>
-                            <td>{barangs.nama}</td>
-                            <td>{formatRupiah(barangs.harga)}</td>
-                            <td>{barangs.stok}</td>
-                            <td>{barangs.tag}</td>
-                            <td>{barangs.berat} gram</td>
-                            <td>{barangs.deskripsi}</td>
-                            <td>{barangs.detail}</td>
-                            <td>
-                              <img
-                                src={
-                                  barangs.gambar
-                                    ? `http://localhost:8000/${barangs.gambar}`
-                                    : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
-                                }
-                                style={{ width: "100px", height: "auto" }}
-                              />
-                            </td>
-                            <td className="text-center">
-                              <Link
-                                to={`/admin/barang/edit/${barangs.id}`}
-                                className="btn btn-sm btn-warning text-white rounded-sm border-0 me-2"
-                              >
-                                Edit
-                              </Link>
-                              <button
-                                onClick={() => deleteBarang(barangs.id)}
-                                className="btn btn-sm btn-danger rounded-sm border-0"
-                              >
-                                Hapus
-                              </button>
+                    <table
+                      className="table table-bordered"
+                      style={{ minWidth: "1500px" }}
+                    >
+                      <thead className="bg-primary text-white">
+                        <tr>
+                          <th
+                            scope="col"
+                            className="text-center fw-semibold"
+                            style={{ width: "1%" }}
+                          >
+                            No
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "2%" }}
+                          >
+                            Kode
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "8%" }}
+                          >
+                            Nama
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "7%" }}
+                          >
+                            Harga
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "2%" }}
+                          >
+                            Stok
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "4%" }}
+                          >
+                            Tag
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "6%" }}
+                          >
+                            Berat
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "20%" }}
+                          >
+                            Deskripsi
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "10%" }}
+                          >
+                            Detail
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold"
+                            style={{ width: "10%" }}
+                          >
+                            Gambar
+                          </th>
+                          <th
+                            scope="col"
+                            className="fw-semibold text-center"
+                            style={{ width: "10%" }}
+                          ></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {barang.length > 0 ? (
+                          barang.map((barangs, index) => (
+                            <tr key={index}>
+                              <td className="text-center">{index + 1}</td>
+                              <td>{barangs.kode}</td>
+                              <td>{barangs.nama}</td>
+                              <td>Rp. {barangs.harga}</td>
+                              <td>{barangs.stok}</td>
+                              <td>{barangs.tag}</td>
+                              <td>{barangs.berat} gram</td>
+                              <td>{barangs.deskripsi}</td>
+                              <td>{barangs.detail}</td>
+                              <td>
+                                <img
+                                  src={
+                                    barangs.gambar
+                                      ? `http://localhost:8000/${barangs.gambar}`
+                                      : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
+                                  }
+                                  style={{ width: "100px", height: "auto" }}
+                                />
+                              </td>
+                              <td className="text-center">
+                                <Link
+                                  to={`/admin/barang/detail/${barangs.id}`}
+                                  className="btn btn-sm btn-info text-white rounded-sm border-0 me-2"
+                                >
+                                  Detail
+                                </Link>
+                                <Link
+                                  to={`/admin/barang/edit/${barangs.id}`}
+                                  className="btn btn-sm btn-warning text-white rounded-sm border-0 me-2"
+                                >
+                                  Edit
+                                </Link>
+                                <button
+                                  onClick={() => deleteBarang(barangs.id)}
+                                  className="btn btn-sm btn-danger rounded-sm border-0"
+                                >
+                                  Hapus
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="11" className="text-center">
+                              <div className="alert alert-danger mb-0">
+                                Data belum tersedia!
+                              </div>
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="11" className="text-center">
-                            <div className="alert alert-danger mb-0">
-                              Data belum tersedia!
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
