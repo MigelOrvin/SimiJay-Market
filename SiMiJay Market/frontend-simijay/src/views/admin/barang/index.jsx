@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDataBarang = async () => {
     const token = localStorage.getItem("token");
@@ -31,6 +32,14 @@ export default function BarangIndex() {
     fetchDataBarang();
   }, []);
 
+  const formatRupiah = (number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(number);
+  };
+
   const deleteBarang = async (id) => {
     const token = localStorage.getItem("token");
 
@@ -48,6 +57,14 @@ export default function BarangIndex() {
     }
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredBarang = barang.filter((barangs) =>
+    barangs.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
   return (
     <>
       <Navbar />
@@ -59,13 +76,29 @@ export default function BarangIndex() {
           <div className="col-md-9">
             <div className="card border-0 rounded shadow-sm">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Barang</span>
-                <Link
-                  to="/admin/barang/create"
-                  className="btn btn-sm btn-success rounded shadow-sm border-0"
-                >
-                  Tambah Barang
-                </Link>
+                <span className="fw-bold me-3">Barang</span>
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  style={{ width: "200px" }}
+                  placeholder="Cari Nama Produk"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+                <div className="d-flex">
+                  <Link
+                    to={`/admin/barang/detail`}
+                    className="btn btn-sm btn-info text-white rounded-sm border-0 me-2"
+                  >
+                    Lihat Barang
+                  </Link>
+                  <Link
+                    to="/admin/barang/create"
+                    className="btn btn-sm btn-success rounded shadow-sm border-0"
+                  >
+                    Tambah Barang
+                  </Link>
+                </div>
               </div>
               <div className="card-body">
                 <div
@@ -160,13 +193,13 @@ export default function BarangIndex() {
                       </tr>
                     </thead>
                     <tbody>
-                      {barang.length > 0 ? (
-                        barang.map((barangs, index) => (
+                      {filteredBarang.length > 0 ? (
+                        filteredBarang.map((barangs, index) => (
                           <tr key={index}>
                             <td className="text-center">{index + 1}</td>
                             <td>{barangs.kode}</td>
                             <td>{barangs.nama}</td>
-                            <td>Rp. {barangs.harga}</td>
+                            <td>{formatRupiah(barangs.harga)}</td>
                             <td>{barangs.stok}</td>
                             <td>{barangs.tag}</td>
                             <td>{barangs.berat} gram</td>
@@ -183,12 +216,6 @@ export default function BarangIndex() {
                               />
                             </td>
                             <td className="text-center">
-                              <Link
-                                to={`/admin/barang/detail/${barangs.id}`}
-                                className="btn btn-sm btn-info text-white rounded-sm border-0 me-2"
-                              >
-                                Detail
-                              </Link>
                               <Link
                                 to={`/admin/barang/edit/${barangs.id}`}
                                 className="btn btn-sm btn-warning text-white rounded-sm border-0 me-2"

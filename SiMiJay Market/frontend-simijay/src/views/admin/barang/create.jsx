@@ -190,13 +190,18 @@ export default function BarangCreate() {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="mb-1 fw-semibold">Tag :</label>
-                        <input
-                          type="text"
+                        <select
+                          className="form-select"
                           value={tag}
                           onChange={(e) => setTag(e.target.value)}
-                          className="form-control"
                           required
-                        />
+                        >
+                          <option value="" disabled>
+                            Pilih Tag
+                          </option>
+                          <option value="expensive">Expensive</option>
+                          <option value="cheap">Cheap</option>
+                        </select>
                       </div>
                     </div>
                     <div className="col-md-6">

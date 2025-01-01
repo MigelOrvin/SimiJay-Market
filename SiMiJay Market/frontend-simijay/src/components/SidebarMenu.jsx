@@ -49,6 +49,12 @@ export default function SidebarMenu() {
             >
               User
             </Link>
+            <Link
+              to="/admin/labarugi"
+              className="list-group-item list-group-item-action"
+            >
+              Laporan Laba Rugi
+            </Link>
           </div>
         )}
         {user.role === "customer" && (
