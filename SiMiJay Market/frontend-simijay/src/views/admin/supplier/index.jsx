@@ -7,6 +7,7 @@ import SidebarMenu from "../../../components/SidebarMenu";
 export default function SupplierIndex() {
   
   const [supplier, setSupplier] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDataSupplier = async () => {
     const token = localStorage.getItem("token");
@@ -48,6 +49,14 @@ export default function SupplierIndex() {
     }
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredSupplier = supplier.filter((suppliers) =>
+    suppliers.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       <Navbar />
@@ -60,12 +69,22 @@ export default function SupplierIndex() {
             <div className="card border-0 rounded shadow-sm">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <span className="fw-bold">Supplier</span>
-                <Link
-                  to="/admin/supplier/create"
-                  className="btn btn-sm btn-success rounded shadow-sm border-0"
-                >
-                  Tambah Supplier
-                </Link>
+                <div className="d-flex">
+                  <input
+                    type="text"
+                    className="form-control form-control-sm me-2"
+                    placeholder="Cari Nama Supplier"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    style={{ width: "150px" }}
+                  />
+                  <Link
+                    to="/admin/supplier/create"
+                    className="btn btn-sm btn-success rounded shadow-sm border-0"
+                  >
+                    Tambah Supplier
+                  </Link>
+                </div>
               </div>
               <div className="card-body">
                 <table className="table table-bordered">
@@ -80,13 +99,13 @@ export default function SupplierIndex() {
                     </tr>
                   </thead>
                   <tbody>
-                    {supplier.length > 0 ? (
-                      supplier.map((suppliers, index) => (
+                    {filteredSupplier.length > 0 ? (
+                      filteredSupplier.map((suppliers, index) => (
                         <tr key={index}>
                           <td className="text-center">{index + 1}</td>
                           <td>{suppliers.nama}</td>
                           <td>{suppliers.nama_barang}</td>
-                          <td>{suppliers.stok} kg</td>
+                          <td>{suppliers.stok}</td>
                           <td>Rp. {suppliers.harga}</td>
                           <td className="text-center">
                             <Link

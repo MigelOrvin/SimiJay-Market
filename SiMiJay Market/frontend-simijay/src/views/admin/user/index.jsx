@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function UserIndex() {
   const [user, setUser] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDataUser = async () => {
     const token = localStorage.getItem("token");
@@ -47,6 +48,14 @@ export default function UserIndex() {
     }
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredUser = user.filter((users) =>
+    users.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       <Navbar />
@@ -59,12 +68,22 @@ export default function UserIndex() {
             <div className="card border-0 rounded shadow-sm">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <span className="fw-bold">User</span>
-                <Link
-                  to="/admin/user/create"
-                  className="btn btn-sm btn-success rounded shadow-sm border-0"
-                >
-                  Tambah User
-                </Link>
+                <div className="d-flex">
+                  <input
+                    type="text"
+                    className="form-control form-control-sm me-2"
+                    placeholder="Cari Nama User"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    style={{ width: "150px" }}
+                  />
+                  <Link
+                    to="/admin/user/create"
+                    className="btn btn-sm btn-success rounded shadow-sm border-0"
+                  >
+                    Tambah User
+                  </Link>
+                </div>
               </div>
               <div className="card-body">
                 <div
@@ -131,8 +150,8 @@ export default function UserIndex() {
                       </tr>
                     </thead>
                     <tbody>
-                      {user.length > 0 ? (
-                        user.map((users, index) => (
+                      {filteredUser.length > 0 ? (
+                        filteredUser.map((users, index) => (
                           <tr key={index}>
                             <td className="text-center">{index + 1}</td>
                             <td>{users.kode}</td>

@@ -7,7 +7,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LabaRugiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum', 'auth', 'cekrole:admin'])->group(function () 
     Route::put('/admin/supplier/{id}', [SupplierController::class, 'update']);
     Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy']);
 
+    Route::get('/admin/labarugi', [LabaRugiController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'auth', 'cekrole:customer'])->group(function () {

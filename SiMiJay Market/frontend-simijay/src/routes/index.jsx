@@ -25,6 +25,7 @@ import BarangKasirIndex  from "../views/kasir/barang/kasirIndex";
 import KeranjangKasirIndex  from "../views/kasir/keranjang/kasirIndex";
 import TransaksiKasirIndex  from "../views/kasir/transaksi/kasirIndex";
 import TransaksiLaporan  from "../views/kasir/laporan/index";
+import LabaRugiIndex from "../views/admin/labarugi/index";
 
 export default function AppRoutes() {
 
@@ -51,12 +52,15 @@ export default function AppRoutes() {
         <Route path="/admin/barang" element={isAuthenticated ? <BarangIndex /> : <Navigate to="/login" replace />} />
         <Route path="/admin/barang/create" element={isAuthenticated ? <BarangCreate /> : <Navigate to="/login" replace />} />
         <Route path="/admin/barang/edit/:id" element={isAuthenticated ? <BarangEdit /> : <Navigate to="/login" replace />} />
-        <Route path="/admin/barang/detail/:id" element={isAuthenticated ? <BarangDetail /> : <Navigate to="/login" replace />} />
+        <Route path="/admin/barang/detail" element={isAuthenticated ? <BarangDetail /> : <Navigate to="/login" replace />} />
 
         {/* Route Admin User */}
         <Route path="/admin/user" element={isAuthenticated ? <UserIndex /> : <Navigate to="/login" replace />} />
         <Route path="/admin/user/create" element={isAuthenticated ? <UserCreate /> : <Navigate to="/login" replace />} />
         <Route path="/admin/user/edit/:id" element={isAuthenticated ? <UserEdit /> : <Navigate to="/login" replace />} />
+
+        {/* Route Admin Laba Rugi */}
+        <Route path="/admin/labarugi" element={isAuthenticated ? <LabaRugiIndex /> : <Navigate to="/login" replace />} />
 
         {/* Route Customer */}
         <Route path="/customer/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
