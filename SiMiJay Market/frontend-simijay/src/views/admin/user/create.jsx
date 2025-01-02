@@ -2,6 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu";
 import { useState } from "react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../../../styles/customAlert.css";
 
 export default function UserCreate() {
   const token = localStorage.getItem("token");
@@ -12,8 +15,10 @@ export default function UserCreate() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [foto, setFoto] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const MySwal = withReactContent(Swal);
 
   const storeUser = async (e) => {
     e.preventDefault();
@@ -35,8 +40,13 @@ export default function UserCreate() {
           "Content-Type": "multipart/form-data",
         },
       });
-      setSuccessMessage("User berhasil ditambahkan"); // Set success message on create
-      navigate("/admin/user");
+
+      setAlertMessage(`${nama} berhasil ditambahkan`);
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+        navigate("/admin/user");
+      }, 500);
     } catch (error) {
       console.error("Gagal menambahkan user", error);
     }
@@ -49,16 +59,13 @@ export default function UserCreate() {
   return (
     <>
       <SidebarMenu onToggleSidebar={handleToggleSidebar} />
-      <div className={`home_main ${isSidebarActive ? "active" : ""}`}>
+      <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
         <div className="container mb-5 mt-5">
           <div className="row">
             <div className="col-md-12">
               <div className="card border-0 rounded shadow-sm">
                 <div className="card-header fw-bold">Tambah User</div>
                 <div className="card-body">
-                  {successMessage && (
-                    <div className="alert alert-success">{successMessage}</div>
-                  )} {/* Display success message */}
                   <form onSubmit={storeUser}>
                     <div className="row">
                       <div className="col-md-6">
@@ -129,7 +136,10 @@ export default function UserCreate() {
                     <button type="submit" className="btn btn-sm btn-primary">
                       Simpan
                     </button>
-                    <Link to="/admin/user" className="mx-2 btn btn-sm btn-secondary">
+                    <Link
+                      to="/admin/user"
+                      className="mx-2 btn btn-sm btn-secondary"
+                    >
                       Kembali
                     </Link>
                   </form>
@@ -139,6 +149,13 @@ export default function UserCreate() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="custom-alert-content">
+            <span>{alertMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu";
 
 const Transaksi = () => {
   const [transaksi, setTransaksi] = useState([]);
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [totalPengeluaran, setTotalPengeluaran] = useState(0);
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTransaksi = async () => {
@@ -19,16 +22,48 @@ const Transaksi = () => {
       try {
         const response = await Api.get("/api/customer/transaksi");
         setTransaksi(response.data.transaksi);
+        const total = response.data.transaksi.reduce(
+          (sum, trans) => sum + trans.total_harga,
+          0
+        );
+        setTotalPengeluaran(total);
       } catch (error) {
-        console.error("Gagal mengambil data transaksi:", error.response ? error.response.data : error.message);
+        console.error(
+          "Gagal mengambil data transaksi:",
+          error.response ? error.response.data : error.message
+        );
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTransaksi();
   }, []);
 
+  useEffect(() => {
+    const filteredTransaksi = transaksi.filter((trans) =>
+      selectedDate
+        ? new Date(trans.waktu_transaksi).toLocaleDateString() ===
+          new Date(selectedDate).toLocaleDateString()
+        : true
+    );
+    const total = filteredTransaksi.reduce(
+      (sum, trans) => sum + trans.total_harga,
+      0
+    );
+    setTotalPengeluaran(total);
+  }, [selectedDate, transaksi]);
+
   const handleToggleSidebar = (isActive) => {
     setIsSidebarActive(isActive);
+  };
+
+  const formatRupiah = (number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(number);
   };
 
   return (
@@ -38,31 +73,105 @@ const Transaksi = () => {
         <div className="container mt-5 mb-5">
           <div className="row">
             <div className="col-md-12">
-              {transaksi.length > 0 ? (
-                transaksi.map((trans) => (
-                  <div key={trans.id} className="card border-0 rounded shadow-sm mb-4">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                      <span className="fw-bold">ID Transaksi: {trans.id}</span>
-                    </div>
-                    <div className="card-body">
-                      <h5>Total Harga: Rp. {trans.total_harga}</h5>
-                      <h5>Waktu Transaksi: {trans.waktu_transaksi}</h5>
-                      <h5>Detail Barang:</h5>
-                      <ul>
-                        {trans.details.map((detail) => (
-                          <li key={detail.id}>
-                            {detail.barang.nama} - {detail.jumlah} x Rp. {detail.harga}
-                          </li>
-                        ))}
-                      </ul>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="card border-0 rounded shadow-sm mb-4">
+                    <div className="card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <h4>Total Pengeluaran</h4>
+                        <h5>{formatRupiah(totalPengeluaran)}</h5>
+                      </div>
+                      <div>
+                        <input
+                          type="date"
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="form-control mb-2"
+                        />
+                        <button
+                          onClick={() => setSelectedDate("")}
+                          className="btn btn-primary w-100"
+                        >
+                          Tampilkan Semua
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="alert alert-danger text-center">
-                  Tidak ada transaksi terbaru!
                 </div>
-              )}
+              </div>
+              <div className="row">
+                {isLoading ? (
+                  <div className="text-center">
+                    <div
+                      className="spinner-border"
+                      style={{ color: "#89CFF0" }}
+                      role="status"
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <div className="mt-2">Loading</div>
+                  </div>
+                ) : transaksi.length === 0 ? (
+                  <div className="col-md-12">
+                    <div className="card border-0 rounded shadow-sm mb-4">
+                      <div className="card-body text-center">
+                        Belum ada transaksi!
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  transaksi
+                    .filter((trans) =>
+                      selectedDate
+                        ? new Date(
+                            trans.waktu_transaksi
+                          ).toLocaleDateString() ===
+                          new Date(selectedDate).toLocaleDateString()
+                        : true
+                    )
+                    .map((trans) => (
+                      <div key={trans.id} className="col-md-6">
+                        <div className="card border-0 rounded shadow-sm mb-4">
+                          <div className="card-header d-flex justify-content-between align-items-center">
+                            <span className="fw-bold">
+                              ID Transaksi: {trans.id}
+                            </span>
+                          </div>
+                          <div className="card-body">
+                            <h5>Waktu Transaksi : {trans.waktu_transaksi}</h5>
+                            <h5>
+                              Total Harga : {formatRupiah(trans.total_harga)}
+                            </h5>
+                            <h5>Detail Barang :</h5>
+                            <ul>
+                              {trans.details.map((detail) => (
+                                <li key={detail.id}>
+                                  {detail.barang.nama} - {detail.jumlah} x{" "}
+                                  {formatRupiah(detail.harga)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                )}
+                {selectedDate &&
+                  transaksi.filter(
+                    (trans) =>
+                      new Date(trans.waktu_transaksi).toLocaleDateString() ===
+                      new Date(selectedDate).toLocaleDateString()
+                  ).length === 0 && (
+                    <div className="col-md-12">
+                      <div className="card border-0 rounded shadow-sm mb-4">
+                        <div className="card-body text-center">
+                          Tidak ada transaksi pada tanggal{" "}
+                          {new Date(selectedDate).toLocaleDateString("id-ID")}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
         </div>

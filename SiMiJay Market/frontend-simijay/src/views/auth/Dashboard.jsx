@@ -3,16 +3,18 @@ import SidebarMenu from "../../components/SidebarMenu";
 
 export default function Dashboard() {
   const [user, setUser] = useState([]);
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [successMessage, setSuccessMessage] = useState(""); 
+  const [isSidebarActive, setIsSidebarActive] = useState(false); 
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
 
     if (userData) {
       setUser(JSON.parse(userData));
-      setSuccessMessage("Berhasil Login"); // Set success message on login
+      setSuccessMessage("Berhasil Login"); 
     }
+    setIsLoading(false);
   }, []);
 
   const handleToggleSidebar = (isActive) => {
@@ -29,11 +31,22 @@ export default function Dashboard() {
               <div className="card border-0 rounded shadow-sm">
                 <div className="card-header">Dashboard</div>
                 <div className="card-body">
-                  {successMessage && (
-                    <div className="alert alert-success">{successMessage}</div>
-                  )} {/* Display success message */}
-                  Selamat datang <strong>{user?.nama}</strong>, Anda login sebagai{" "}
-                  <strong>{user?.role}</strong>
+                  {isLoading ? (
+                    <div className="text-center">
+                      <div className="spinner-border" style={{ color: "#89CFF0" }} role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <div className="mt-2">Loading</div>
+                    </div>
+                  ) : (
+                    <>
+                      {successMessage && (
+                        <div className="alert alert-success">{successMessage}</div>
+                      )}
+                      Selamat datang <strong>{user?.nama}</strong>, Anda login sebagai{" "}
+                      <strong>{user?.role}</strong>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

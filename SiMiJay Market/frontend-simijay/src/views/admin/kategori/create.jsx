@@ -2,13 +2,18 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../../../styles/customAlert.css";
 
 export default function KategoriCreate() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [nama, setNama] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const MySwal = withReactContent(Swal);
 
   const storeKategori = async (e) => {
     e.preventDefault();
@@ -18,10 +23,14 @@ export default function KategoriCreate() {
     await Api.post("/api/admin/kategori/store", {
       nama: nama,
     })
-      .then(() => {
-        setSuccessMessage("Kategori berhasil ditambahkan"); // Set success message on create
+    .then(() => {
+      setAlertMessage(`${nama} berhasil ditambahkan`);
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
         navigate("/admin/kategori");
-      })
+      }, 500);
+    })
       .catch((error) => {
         console.error("Gagal menambahkan kategori", error);
       });
@@ -41,9 +50,6 @@ export default function KategoriCreate() {
               <div className="card border-0 rounded shadow-sm">
                 <div className="card-header fw-bold">Tambah Kategori</div>
                 <div className="card-body">
-                  {successMessage && (
-                    <div className="alert alert-success">{successMessage}</div>
-                  )} {/* Display success message */}
                   <form onSubmit={storeKategori}>
                     <div className="form-group mb-3">
                       <label className="mb-1 fw-semibold">Nama Kategori</label>
@@ -67,6 +73,13 @@ export default function KategoriCreate() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="custom-alert-content">
+            <span>{alertMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
