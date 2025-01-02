@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Api from "../../../services/api";
-
 import SidebarMenu from "../../../components/SidebarMenu";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../../../styles/customAlert.css";
 
 export default function SupplierCreate() {
   const token = localStorage.getItem("token");
@@ -12,8 +14,10 @@ export default function SupplierCreate() {
   const [namaBarang, setNamaBarang] = useState("");
   const [stok, setStok] = useState("");
   const [harga, setHarga] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const MySwal = withReactContent(Swal);
 
   const storeSupplier = async (e) => {
     e.preventDefault();
@@ -26,8 +30,12 @@ export default function SupplierCreate() {
       harga: harga,
     })
       .then(() => {
-        setSuccessMessage("Supplier berhasil ditambahkan"); // Set success message on create
-        navigate("/admin/supplier");
+        setAlertMessage(`${nama} berhasil ditambahkan`);
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+          navigate("/admin/supplier");
+        }, 500);
       })
       .catch((error) => {
         console.error("Gagal menambahkan supplier", error);
@@ -48,9 +56,6 @@ export default function SupplierCreate() {
               <div className="card border-0 rounded shadow-sm">
                 <div className="card-header fw-bold">Tambah Supplier</div>
                 <div className="card-body">
-                  {successMessage && (
-                    <div className="alert alert-success">{successMessage}</div>
-                  )} {/* Display success message */}
                   <form onSubmit={storeSupplier}>
                     <div className="form-group mb-3">
                       <label className="mb-1 fw-semibold">Nama Supplier</label>
@@ -106,6 +111,13 @@ export default function SupplierCreate() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="custom-alert-content">
+            <span>{alertMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

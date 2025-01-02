@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Api from "../../../services/api";
-
 import SidebarMenu from "../../../components/SidebarMenu";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../../../styles/customAlert.css";
 
 export default function SupplierEdit() {
   const token = localStorage.getItem("token");
@@ -15,8 +17,10 @@ export default function SupplierEdit() {
   const [namaBarang, setNamaBarang] = useState("");
   const [stok, setStok] = useState("");
   const [harga, setHarga] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const MySwal = withReactContent(Swal);
 
   const fetchDetailSupplier = async () => {
     await Api.get(`/api/admin/supplier/${id}`).then((response) => {
@@ -41,10 +45,14 @@ export default function SupplierEdit() {
       stok: stok,
       harga: harga,
     })
-      .then(() => {
-        setSuccessMessage("Supplier berhasil diupdate"); // Set success message on update
+    .then(() => {
+      setAlertMessage(`${nama} berhasil diupdate`);
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
         navigate("/admin/supplier");
-      })
+      }, 500);
+    })
       .catch((error) => {
         console.error("Gagal edit data supplier", error);
       });
@@ -64,9 +72,6 @@ export default function SupplierEdit() {
               <div className="card border-0 rounded shadow-sm">
                 <div className="card-header fw-bold">Edit Supplier</div>
                 <div className="card-body">
-                  {successMessage && (
-                    <div className="alert alert-success">{successMessage}</div>
-                  )} {/* Display success message */}
                   <form onSubmit={updateSupplier}>
                     <div className="form-group mb-3">
                       <label className="mb-1 fw-semibold">Nama Supplier</label>
@@ -109,7 +114,10 @@ export default function SupplierEdit() {
                     <button type="submit" className="btn btn-sm btn-primary">
                       Update
                     </button>
-                    <Link to="/admin/supplier" className="mx-2 btn btn-sm btn-secondary">
+                    <Link
+                      to="/admin/supplier"
+                      className="mx-2 btn btn-sm btn-secondary"
+                    >
                       Kembali
                     </Link>
                   </form>
@@ -119,6 +127,13 @@ export default function SupplierEdit() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="custom-alert-content">
+            <span>{alertMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
