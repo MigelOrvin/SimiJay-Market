@@ -3,23 +3,23 @@ import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu"; 
 import { Link, useParams } from "react-router-dom";
 
-export default function BarangIndex() {
-  const [barang, setBarang] = useState([]);
+export default function BarangDetail() {
+  const { id } = useParams();
+  const [barang, setBarang] = useState(null);
   const [isSidebarActive, setIsSidebarActive] = useState(false); 
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchDataBarang = async () => {
+  const fetchBarangDetail = async () => {
     const token = localStorage.getItem("token");
 
     if (token) {
       Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       try {
-        const response = await Api.get("/api/admin/barang");
+        const response = await Api.get(`/api/admin/barang/${id}`);
         setBarang(response.data.data.barang);
       } catch (error) {
         console.error(
-          "Terjadi error ketika fetching data barang:",
+          "Terjadi error ketika fetching detail barang:",
           error.response ? error.response.data : error.message
         );
       }
@@ -29,8 +29,8 @@ export default function BarangIndex() {
   };
 
   useEffect(() => {
-    fetchDataBarang();
-  }, []);
+    fetchBarangDetail();
+  }, [id]);
 
   const handleToggleSidebar = (isActive) => {
     setIsSidebarActive(isActive);
@@ -44,14 +44,6 @@ export default function BarangIndex() {
     }).format(number);
   };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredBarang = barang.filter((barangs) =>
-    barangs.nama.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <>
       <SidebarMenu onToggleSidebar={handleToggleSidebar} />
@@ -61,73 +53,58 @@ export default function BarangIndex() {
             <div className="col-md-12">
               <div className="card border-0 rounded shadow-sm">
                 <div className="d-flex justify-content-between align-items-center mb-3 p-3">
-                  <h4 className="fw-bold">DATA BARANG</h4>
-                  <div className="d-flex">
-                    <input
-                      type="text"
-                      className="form-control form-control-sm me-2"
-                      placeholder="Cari Nama Produk"
-                      value={searchTerm}
-                      onChange={handleSearch}
-                    />
-                    <Link
-                      to={`/admin/barang`}
-                      className="btn btn-sm btn-info text-white rounded-sm border-0"
-                    >
-                      Kembali
-                    </Link>
-                  </div>
+                  <h4 className="fw-bold">DETAIL BARANG</h4>
+                  <Link
+                    to={`/admin/barang`}
+                    className="btn btn-sm btn-info text-white rounded-sm border-0"
+                  >
+                    Kembali
+                  </Link>
                 </div>
-                <div className="card border-0 rounded shadow-sm">
-                  <div className="card-body">
-                    {filteredBarang.length > 0 ? (
-                      filteredBarang.map((barangs, index) => (
-                        <div key={index} className="card mb-3">
-                          <div className="row g-0">
-                            <div className="col-md-4">
-                              <img
-                                src={
-                                  barangs.gambar
-                                    ? `http://localhost:8000/${barangs.gambar}`
-                                    : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
-                                }
-                                className="img-fluid rounded-start h-100"
-                                alt={barangs.nama}
-                                style={{ objectFit: "cover" }}
-                              />
-                            </div>
-                            <div className="col-md-8">
-                              <div className="card-body">
-                                <h5 className="card-title fw-bold d-flex justify-content-between">
-                                  {barangs.nama}
-                                  <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                                    Stok : {barangs.stok}
-                                  </span>
-                                </h5>
-                                <p className="card-text mb-1">
-                                  <em>{barangs.tag}</em>
-                                  <br />
-                                  {formatRupiah(barangs.harga)} /{" "}
-                                  <strong>{barangs.berat} gram</strong>
-                                </p>
-                                <hr />
-                                <p className="card-text mb-1">
-                                  {barangs.deskripsi}
-                                </p>
-                                <div className="card-text p-2 border rounded mb-1">
-                                  {barangs.detail}
-                                </div>
-                              </div>
-                            </div>
+                <div className="card-body">
+                  {barang ? (
+                    <div className="row g-0">
+                      <div className="col-md-4">
+                        <img
+                          src={
+                            barang.gambar
+                              ? `http://localhost:8000/${barang.gambar}`
+                              : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
+                          }
+                          className="img-fluid rounded-start h-100"
+                          alt={barang.nama}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                      <div className="col-md-8">
+                        <div className="card-body">
+                          <h5 className="card-title fw-bold d-flex justify-content-between">
+                            {barang.nama}
+                            <span className="text-muted" style={{ fontSize: "0.8rem" }}>
+                              Stok : {barang.stok}
+                            </span>
+                          </h5>
+                          <p className="card-text mb-1">
+                            <em>{barang.tag}</em>
+                            <br />
+                            {formatRupiah(barang.harga)} /{" "}
+                            <strong>{barang.berat} gram</strong>
+                          </p>
+                          <hr />
+                          <p className="card-text mb-1">
+                            {barang.deskripsi}
+                          </p>
+                          <div className="card-text p-2 border rounded mb-1">
+                            {barang.detail}
                           </div>
                         </div>
-                      ))
-                    ) : (
-                      <div className="alert alert-danger mb-0">
-                        Loading ...
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="alert alert-danger mb-0">
+                      Loading ...
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

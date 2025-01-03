@@ -48,7 +48,7 @@ export default function EditBarang() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "gambar") {
+    if (name === "gambar" && files.length > 0) {
       setBarang({ ...barang, gambar: files[0] });
     } else {
       setBarang({ ...barang, [name]: value });

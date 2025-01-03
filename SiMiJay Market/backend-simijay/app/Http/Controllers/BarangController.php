@@ -181,7 +181,6 @@ class BarangController extends Controller
     
                 $relativePath = $this->saveImage($request->gambar);
                 $barang->gambar = $relativePath;
-                $barang->save();
             }
 
             $barang->update([
