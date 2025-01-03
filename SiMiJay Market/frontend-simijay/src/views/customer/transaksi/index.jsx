@@ -120,41 +120,45 @@ const Transaksi = () => {
                     </div>
                   </div>
                 ) : (
-                  transaksi
-                    .filter((trans) =>
-                      selectedDate
-                        ? new Date(
-                            trans.waktu_transaksi
-                          ).toLocaleDateString() ===
-                          new Date(selectedDate).toLocaleDateString()
-                        : true
-                    )
-                    .map((trans) => (
-                      <div key={trans.id} className="col-md-6">
-                        <div className="card border-0 rounded shadow-sm mb-4">
-                          <div className="card-header d-flex justify-content-between align-items-center">
-                            <span className="fw-bold">
-                              ID Transaksi: {trans.id}
-                            </span>
+                  <div className="col-md-12">
+                    <div className="list-group">
+                      {transaksi
+                        .filter((trans) =>
+                          selectedDate
+                            ? new Date(
+                                trans.waktu_transaksi
+                              ).toLocaleDateString() ===
+                              new Date(selectedDate).toLocaleDateString()
+                            : true
+                        )
+                        .map((trans) => (
+                          <div key={trans.id} className="list-group-item">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span className="fw-bold">
+                                ID Transaksi: {trans.id}
+                              </span>
+                              <span>
+                                Waktu Transaksi: {trans.waktu_transaksi}
+                              </span>
+                              <span>
+                                Total Harga: {formatRupiah(trans.total_harga)}
+                              </span>
+                            </div>
+                            <div>
+                              <h5>Detail Barang:</h5>
+                              <ul>
+                                {trans.details.map((detail) => (
+                                  <li key={detail.id}>
+                                    {detail.barang.nama} - {detail.jumlah} x{" "}
+                                    {formatRupiah(detail.harga)}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           </div>
-                          <div className="card-body">
-                            <h5>Waktu Transaksi : {trans.waktu_transaksi}</h5>
-                            <h5>
-                              Total Harga : {formatRupiah(trans.total_harga)}
-                            </h5>
-                            <h5>Detail Barang :</h5>
-                            <ul>
-                              {trans.details.map((detail) => (
-                                <li key={detail.id}>
-                                  {detail.barang.nama} - {detail.jumlah} x{" "}
-                                  {formatRupiah(detail.harga)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    ))
+                        ))}
+                    </div>
+                  </div>
                 )}
                 {selectedDate &&
                   transaksi.filter(
