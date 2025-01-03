@@ -7,11 +7,6 @@ export default function Dashboard() {
   const [successMessage, setSuccessMessage] = useState(""); 
   const [isSidebarActive, setIsSidebarActive] = useState(false); 
   const [isLoading, setIsLoading] = useState(true);
-  const [totalBarang, setTotalBarang] = useState(0);
-  const [totalKategori, setTotalKategori] = useState(0);
-  const [totalSupplier, setTotalSupplier] = useState(0);
-  const [recentActivities, setRecentActivities] = useState([]);
-  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -20,35 +15,8 @@ export default function Dashboard() {
       setUser(JSON.parse(userData));
       setSuccessMessage("Berhasil Login"); 
     }
-    fetchData();
+    setIsLoading(false);
   }, []);
-
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (token) {
-        Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        const [barangRes, kategoriRes, supplierRes, activitiesRes, notificationsRes] = await Promise.all([
-          Api.get("/api/admin/barang"),
-          Api.get("/api/admin/kategori"),
-          Api.get("/api/admin/supplier"),
-          Api.get("/api/admin/activities"),
-          Api.get("/api/admin/notifications")
-        ]);
-
-        setTotalBarang(barangRes.data.data.barang.length);
-        setTotalKategori(kategoriRes.data.length);
-        setTotalSupplier(supplierRes.data.length);
-        setRecentActivities(activitiesRes.data.data.activities);
-        setNotifications(notificationsRes.data.data.notifications);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleToggleSidebar = (isActive) => {
     setIsSidebarActive(isActive);
@@ -82,62 +50,6 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-              {user.role === "admin" && (
-                <>
-                  <div className="row">
-                    <div className="col-md-4">
-                      <div className="card border-0 rounded shadow-sm mb-4">
-                        <div className="card-body text-center">
-                          <h5 className="card-title">Total Barang</h5>
-                          <p className="card-text display-4">{totalBarang}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="card border-0 rounded shadow-sm mb-4">
-                        <div className="card-body text-center">
-                          <h5 className="card-title">Total Kategori</h5>
-                          <p className="card-text display-4">{totalKategori}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="card border-0 rounded shadow-sm mb-4">
-                        <div className="card-body text-center">
-                          <h5 className="card-title">Total Supplier</h5>
-                          <p className="card-text display-4">{totalSupplier}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-6">
-                      <div className="card border-0 rounded shadow-sm mb-4">
-                        <div className="card-body">
-                          <h5 className="card-title">Aktivitas Terbaru</h5>
-                          <ul className="list-group list-group-flush">
-                            {recentActivities.map((activity, index) => (
-                              <li key={index} className="list-group-item">{activity}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="card border-0 rounded shadow-sm mb-4">
-                        <div className="card-body">
-                          <h5 className="card-title">Notifikasi</h5>
-                          <ul className="list-group list-group-flush">
-                            {notifications.map((notification, index) => (
-                              <li key={index} className="list-group-item">{notification}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
               {user.role === "customer" && (
                 <div className="card border-0 rounded shadow-sm mb-4">
                   <div className="card-body">
