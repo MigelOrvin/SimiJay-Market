@@ -46,7 +46,7 @@ export default function UserCreate() {
       setTimeout(() => {
         setShowAlert(false);
         navigate("/admin/user");
-      }, 500);
+      }, 1500);
     } catch (error) {
       console.error("Gagal menambahkan user", error);
     }

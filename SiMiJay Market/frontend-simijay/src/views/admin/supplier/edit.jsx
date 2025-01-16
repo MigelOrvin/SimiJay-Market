@@ -51,7 +51,7 @@ export default function SupplierEdit() {
       setTimeout(() => {
         setShowAlert(false);
         navigate("/admin/supplier");
-      }, 500);
+      }, 1500);
     })
       .catch((error) => {
         console.error("Gagal edit data supplier", error);

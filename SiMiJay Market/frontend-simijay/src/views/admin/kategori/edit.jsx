@@ -39,7 +39,7 @@ export default function KategoriEdit() {
         setTimeout(() => {
           setShowAlert(false);
           navigate("/admin/kategori");
-        }, 500);
+        }, 1500);
       })
       .catch((error) => {
         console.error("Gagal edit data kategori", error);

@@ -139,8 +139,6 @@ function KeranjangIndex() {
     }).format(number);
   };
 
-  const hasWarnings = Object.values(warnings).some((warning) => warning);
-
   return (
     <>
       <SidebarMenu onToggleSidebar={handleToggleSidebar} />
@@ -227,7 +225,6 @@ function KeranjangIndex() {
                         <button
                           className="btn btn-primary"
                           onClick={handleCheckout}
-                          disabled={hasWarnings}
                         >
                           Beli
                         </button>

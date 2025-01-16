@@ -22,6 +22,7 @@ import ProfileIndex  from "../views/customer/profile/index";
 import ProfileEdit  from "../views/customer/profile/edit";
 import CustomerTransaksiIndex  from "../views/customer/transaksi/index";
 import BarangKasirIndex  from "../views/kasir/barang/kasirIndex";
+import BarangKasirDetail  from "../views/kasir/barang/kasirDetail";
 import KeranjangKasirIndex  from "../views/kasir/keranjang/kasirIndex";
 import TransaksiKasirIndex  from "../views/kasir/transaksi/kasirIndex";
 import TransaksiLaporan  from "../views/kasir/laporan/index";
@@ -83,6 +84,7 @@ export default function AppRoutes() {
         
         {/* Route Kasir Barang*/}
         <Route path="/kasir/barang" element={isAuthenticated ? <BarangKasirIndex /> : <Navigate to="/login" replace />} />
+        <Route path="/kasir/barang/detail" element={isAuthenticated ? <BarangKasirDetail /> : <Navigate to="/login" replace />} />
 
         {/* Route Kasir Keranjang */}
         <Route path="/kasir/keranjang" element={isAuthenticated ? <KeranjangKasirIndex /> : <Navigate to="/login" replace />} />

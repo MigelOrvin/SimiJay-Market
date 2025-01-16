@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Api from "../../../services/api";
 import SidebarMenu from "../../../components/SidebarMenu";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
@@ -47,18 +47,6 @@ export default function BarangIndex() {
     }).format(number);
   };
 
-  const formatBerat = (berat) => {
-    if (berat >= 1000) {
-      const beratInKg = (berat / 1000).toFixed(2);
-      return `${
-        parseFloat(beratInKg) === parseInt(beratInKg)
-          ? parseInt(beratInKg)
-          : beratInKg
-      } kg`;
-    }
-    return `${berat} gram`;
-  };
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -70,7 +58,10 @@ export default function BarangIndex() {
   return (
     <>
       <SidebarMenu onToggleSidebar={handleToggleSidebar} />
-      <div className={`home_content ${isSidebarActive ? "active" : ""}`}>
+      <div
+        className={`home_content ${isSidebarActive ? "active" : ""}`}
+        style={{ marginLeft: isSidebarActive ? "250px" : "0" }}
+      >
         <div className="container mt-5 mb-5">
           <div className="row">
             <div className="col-md-12">
@@ -86,7 +77,7 @@ export default function BarangIndex() {
                       onChange={handleSearch}
                     />
                     <Link
-                      to={`/admin/barang`}
+                      to={`/kasir/barang`}
                       className="btn btn-sm btn-info text-white rounded-sm border-0"
                     >
                       Kembali
@@ -115,7 +106,7 @@ export default function BarangIndex() {
                                 src={
                                   barangs.gambar
                                     ? `http://localhost:8000/${barangs.gambar}`
-                                    : "https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg"
+                                    : "https://img.qraved.co/v2/image/data/2016/09/22/Ayam_Betutu_Khas_Bali_2_1474542488119-x.jpg"
                                 }
                                 className="img-fluid rounded-start h-100"
                                 alt={barangs.nama}
@@ -137,7 +128,7 @@ export default function BarangIndex() {
                                   <em>{barangs.tag}</em>
                                   <br />
                                   {formatRupiah(barangs.harga)} /{" "}
-                                  <strong>{formatBerat(barangs.berat)}</strong>
+                                  <strong>{barangs.berat} gram</strong>
                                 </p>
                                 <hr />
                                 <p className="card-text mb-1">

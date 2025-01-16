@@ -54,7 +54,6 @@ Route::middleware(['auth:sanctum', 'auth', 'cekrole:admin'])->group(function () 
     Route::get('/admin/supplier/{id}', [SupplierController::class, 'show']);
     Route::put('/admin/supplier/{id}', [SupplierController::class, 'update']);
     Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy']);
-
     Route::get('/admin/labarugi', [LabaRugiController::class, 'index']);
 });
 

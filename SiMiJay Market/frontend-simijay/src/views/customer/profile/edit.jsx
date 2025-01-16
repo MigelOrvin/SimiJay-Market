@@ -14,7 +14,7 @@ export default function UserEdit() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [foto, setFoto] = useState(null);
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [isSidebarActive, setIsSidebarActive] = useState(false); 
 
   const fetchDetailUser = async () => {
     if (!token) {
