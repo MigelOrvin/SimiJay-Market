@@ -110,6 +110,7 @@ export default function EditBarang() {
                             value={barang.nama}
                             onChange={handleChange}
                             className="form-control"
+                            disabled
                           />
                         </div>
                       </div>
@@ -127,6 +128,7 @@ export default function EditBarang() {
                                 {k.nama}
                               </option>
                             ))}
+                            disabled
                           </select>
                         </div>
                       </div>
@@ -138,6 +140,7 @@ export default function EditBarang() {
                             value={barang.id_supplier}
                             onChange={handleChange}
                             className="form-select"
+                            disabled
                           >
                             {supplier.map((s) => (
                               <option key={s.id} value={s.id}>
@@ -174,13 +177,18 @@ export default function EditBarang() {
                       <div className="col-md-6">
                         <div className="form-group mb-3">
                           <label className="mb-1 fw-semibold">Tag :</label>
-                          <input
-                            type="text"
+                          <select
                             name="tag"
-                            value={barang.tag}
-                            onChange={handleChange}
+                            value={barang.tag} 
+                            onChange={handleChange} 
                             className="form-control"
-                          />
+                          >
+                            <option value="" disabled>
+                              Select Tag
+                            </option>
+                            <option value="Expensive">Expensive</option>
+                            <option value="Cheap">Cheap</option>
+                          </select>
                         </div>
                       </div>
                       <div className="col-md-6">

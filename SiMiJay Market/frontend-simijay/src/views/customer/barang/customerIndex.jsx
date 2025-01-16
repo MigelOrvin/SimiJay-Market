@@ -92,7 +92,7 @@ export default function BarangIndex() {
     setShowAlert(true);
     setTimeout(() => {
       setShowAlert(false);
-    }, 1000);
+    }, 1500);
   };
 
   const handleCardClick = (id) => {
@@ -260,7 +260,10 @@ export default function BarangIndex() {
                                     <div
                                       className="card-img-top"
                                       style={{
-                                        height: expandedCard === barangs.id ? "400px" : "200px", 
+                                        height:
+                                          expandedCard === barangs.id
+                                            ? "400px"
+                                            : "200px",
                                         overflow: "hidden",
                                         filter:
                                           barangs.stok === 0
@@ -306,7 +309,15 @@ export default function BarangIndex() {
                                           {barangs.deskripsi}
                                         </p>
                                         <div className="card-text p-2 border rounded mb-1">
-                                          {barangs.detail}
+                                          <ul>
+                                            {barangs.detail
+                                              .split(",")
+                                              .map((item, index) => (
+                                                <li key={index}>
+                                                  {item.trim()}
+                                                </li>
+                                              ))}
+                                          </ul>
                                         </div>
                                         <br />
                                         <p className="card-text mb-1">

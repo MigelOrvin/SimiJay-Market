@@ -61,7 +61,7 @@ export default function SupplierIndex() {
         setTimeout(() => {
           setShowAlert(false);
           fetchDataSupplier();
-        }, 500);
+        }, 1500);
       } catch (error) {
         console.error("Gagal menghapus data supplier", error);
       }

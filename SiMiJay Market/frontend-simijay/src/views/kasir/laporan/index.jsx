@@ -132,6 +132,8 @@ const Transaksi = () => {
                           </div>
                           <div className="mt-2">Loading</div>
                         </div>
+                      ) : transaksi.length === 0 ? ( 
+                        <p className="text-center">Belum ada data Laporan Penjualan</p>
                       ) : (
                         <>
                           {filteredProdukTerjual.length > 0 ? (

@@ -1,7 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import Api from "../../../services/api";
-import SidebarMenu from "../../../components/SidebarMenu"; // Ensure this path is correct
+import SidebarMenu from "../../../components/SidebarMenu";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../../../styles/customAlert.css";
 
 export default function BarangCreate() {
   const token = localStorage.getItem("token");
@@ -24,6 +27,9 @@ export default function BarangCreate() {
   const [gambar, setGambar] = useState(null);
   const [isSidebarActive, setIsSidebarActive] = useState(false);
   const [stokWarning, setStokWarning] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const MySwal = withReactContent(Swal);
 
   const handleToggleSidebar = (isActive) => {
     setIsSidebarActive(isActive);
@@ -92,13 +98,19 @@ export default function BarangCreate() {
   const handleNamaChange = (e) => {
     const value = e.target.value;
     setNama(value);
-    setFilteredSupplier(supplier.filter(s => s.nama_barang.toLowerCase() === value.toLowerCase()));
+    setFilteredSupplier(
+      supplier.filter(
+        (s) => s.nama_barang.toLowerCase() === value.toLowerCase()
+      )
+    );
   };
 
   const handleStokChange = (e) => {
     const value = e.target.value;
     setStok(value);
-    const selectedSupplierData = supplier.find(s => s.id === parseInt(selectSupplier));
+    const selectedSupplierData = supplier.find(
+      (s) => s.id === parseInt(selectSupplier)
+    );
     if (selectedSupplierData && value > selectedSupplierData.stok) {
       setStokWarning(`Stok yang tersedia ${selectedSupplierData.stok}`);
     } else {
@@ -126,14 +138,22 @@ export default function BarangCreate() {
 
     await Api.post("/api/admin/barang/store", formData)
       .then(() => {
-        navigate("/admin/barang", "/customer/barang");
+        setAlertMessage(`${nama} berhasil ditambahkan`);
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+          navigate("/admin/barang", "/customer/barang");
+        }, 1500);
       })
       .catch((error) => {
         console.error("Gagal menambahkan barang", error);
       });
   };
 
-  const availableProducts = supplier.filter(s => !barang.some(b => b.nama.toLowerCase() === s.nama_barang.toLowerCase()));
+  const availableProducts = supplier.filter(
+    (s) =>
+      !barang.some((b) => b.nama.toLowerCase() === s.nama_barang.toLowerCase())
+  );
 
   return (
     <>
@@ -162,7 +182,10 @@ export default function BarangCreate() {
                               Pilih Nama Barang
                             </option>
                             {availableProducts.map((suppliers) => (
-                              <option key={suppliers.id} value={suppliers.nama_barang}>
+                              <option
+                                key={suppliers.id}
+                                value={suppliers.nama_barang}
+                              >
                                 {suppliers.nama_barang}
                               </option>
                             ))}
@@ -232,7 +255,9 @@ export default function BarangCreate() {
                             className="form-control"
                             required
                           />
-                          {stokWarning && <p className="text-danger mt-2">{stokWarning}</p>}
+                          {stokWarning && (
+                            <p className="text-danger mt-2">{stokWarning}</p>
+                          )}
                         </div>
                       </div>
                       <div className="col-md-6">
@@ -320,6 +345,13 @@ export default function BarangCreate() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="custom-alert-content">
+            <span>{alertMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

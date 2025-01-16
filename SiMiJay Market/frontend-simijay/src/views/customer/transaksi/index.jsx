@@ -135,17 +135,17 @@ const Transaksi = () => {
                           <div key={trans.id} className="list-group-item">
                             <div className="d-flex justify-content-between align-items-center">
                               <span className="fw-bold">
-                                ID Transaksi: {trans.id}
+                                ID Transaksi : {trans.id}
                               </span>
                               <span>
-                                Waktu Transaksi: {trans.waktu_transaksi}
+                                Waktu Transaksi : {trans.waktu_transaksi}
                               </span>
                               <span>
-                                Total Harga: {formatRupiah(trans.total_harga)}
+                                Total Harga : {formatRupiah(trans.total_harga)}
                               </span>
                             </div>
                             <div>
-                              <h5>Detail Barang:</h5>
+                              <h5>Detail Barang :</h5>
                               <ul>
                                 {trans.details.map((detail) => (
                                   <li key={detail.id}>

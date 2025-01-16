@@ -51,7 +51,7 @@ export default function KategoriIndex() {
         setTimeout(() => {
           setShowAlert(false);
           fetchDataKategori();
-        }, 500);
+        }, 1500);
       } catch (error) {
         console.error("Gagal menghapus data kategori", error);
       }

@@ -4,6 +4,7 @@ import SidebarMenu from "../../../components/SidebarMenu";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import "../../../styles/customAlert.css";
+import { Link, useParams } from "react-router-dom";
 
 export default function BarangIndex() {
   const [barang, setBarang] = useState([]);
@@ -191,6 +192,12 @@ export default function BarangIndex() {
                           </option>
                         ))}
                       </select>
+                      <Link
+                        to="/kasir/barang/detail"
+                        className="btn btn-sm btn-info text-white rounded-sm border-0"
+                      >
+                        Detail
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -260,7 +267,10 @@ export default function BarangIndex() {
                                     <div
                                       className="card-img-top"
                                       style={{
-                                        height: expandedCard === barangs.id ? "400px" : "200px", 
+                                        height:
+                                          expandedCard === barangs.id
+                                            ? "400px"
+                                            : "200px",
                                         overflow: "hidden",
                                         filter:
                                           barangs.stok === 0
@@ -306,7 +316,15 @@ export default function BarangIndex() {
                                           {barangs.deskripsi}
                                         </p>
                                         <div className="card-text p-2 border rounded mb-1">
-                                          {barangs.detail}
+                                          <ul>
+                                            {barangs.detail
+                                              .split(",")
+                                              .map((item, index) => (
+                                                <li key={index}>
+                                                  {item.trim()}
+                                                </li>
+                                              ))}
+                                          </ul>
                                         </div>
                                         <br />
                                         <p className="card-text mb-1">

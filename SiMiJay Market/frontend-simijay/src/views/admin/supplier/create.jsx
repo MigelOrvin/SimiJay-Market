@@ -35,7 +35,7 @@ export default function SupplierCreate() {
         setTimeout(() => {
           setShowAlert(false);
           navigate("/admin/supplier");
-        }, 500);
+        }, 1500);
       })
       .catch((error) => {
         console.error("Gagal menambahkan supplier", error);

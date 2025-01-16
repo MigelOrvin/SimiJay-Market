@@ -11,8 +11,8 @@ export default function UserEdit() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [foto, setFoto] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
-  const [isSidebarActive, setIsSidebarActive] = useState(false); // Add sidebar state
+  const [successMessage, setSuccessMessage] = useState(""); 
+  const [isSidebarActive, setIsSidebarActive] = useState(false); 
 
   const fetchDetailUser = async () => {
     Api.defaults.headers.common["Authorization"] = `Bearer ${token}`;

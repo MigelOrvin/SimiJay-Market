@@ -53,7 +53,7 @@ export default function UserIndex() {
         setTimeout(() => {
           setShowAlert(false);
           fetchDataUser();
-        }, 500);
+        }, 1500);
       } catch (error) {
         console.error("Gagal menghapus data user");
       }
