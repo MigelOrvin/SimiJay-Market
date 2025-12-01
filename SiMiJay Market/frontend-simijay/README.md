@@ -10,6 +10,3 @@
   <li>Role admin dan suppler</li>
 </ul>
 
-## Ini adalah bagian frontendnya
-## Backend menggunakan laravel 10
-### Repositori Backend : [https://github.com/fadhilahhfdz/laravel10-microservice-backend.git](https://github.com/fadhilahhfdz/laravel10-microservice-backend.git)
